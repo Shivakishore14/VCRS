@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<script src="js/jquery.js"></script>
+		<script src="js/script.js"></script>
+		<link rel="stylesheet" href="css/style.css"/>
+	</head>
+	<body>
+		<div class="login-page">
+			<div class="form">
+				<input id="uname" type="text" placeholder="username" name="username"/>
+				<input id="password" type="password" placeholder="password" name="password"/>
+				<button id="btnLogin">login</button>
+				<p class="message">Forgot Password?  <a href="#"> Click here</a></p>
+			</div>
+		</div>
+	</body>
+	<script>
+	$("#btnLogin").on("click",function(){
+		var uname = $("#uname").val();
+		var pass = $("#password").val();
+		$.post('/login/', {username:uname, password:pass }, function(result) {
+	    		if (result == "INVALID"){
+				alert("invalid");				
+			} else {
+				alert("Logged in");		
+			}
+		});
+	});
+	
+	</script>
+</html>
