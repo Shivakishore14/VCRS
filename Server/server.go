@@ -77,6 +77,7 @@ func getQuesHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	tName := r.FormValue("testName")
 	qtype := "text"
+	fmt.Println(id,"-->",tName)
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
 		log.Print(err)
@@ -103,8 +104,23 @@ func getQuesHandler(w http.ResponseWriter, r *http.Request) {
 }
 func getDataHandler(w http.ResponseWriter, r *http.Request) {
 	getTest := r.FormValue("getTest")
-	if getTest == "" {
-		testName := r.FormValue("testName")
+	setTest := r.FormValue("setTest")
+	testName := r.FormValue("testName")
+	status := r.FormValue("status")
+	allTest := r.FormValue("allTest")
+	if status != "" && testName != "" {
+		db, err := sql.Open("mysql", user+":"+password+"@/"+database)
+		if err = db.Ping(); err != nil {	
+			log.Print(err)
+		}
+		defer db.Close()
+		_, e := db.Exec("update testDetails set status = ? where testName = ?",status,testName)
+		if e != nil {
+			log.Print(e)
+		}
+	}
+	if getTest == "" && testName != "" && allTest == ""{
+		
 		//deleted code
 		resJson, erj := json.Marshal(getAns(testName))
 		if erj != nil {
@@ -112,8 +128,14 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, string(resJson))
 		return
+	} else if setTest == "" {
+		if allTest != "" {
+ 			fmt.Fprintf(w, fetchTest(1))
+		} else {
+			fmt.Fprintf(w, fetchTest(0))
+		}
 	} else {
-		fmt.Fprintf(w, fetchTest())
+		fmt.Fprintf(w, "OK")
 	}
 }
 func createNewTestHandler(w http.ResponseWriter, r *http.Request) {
@@ -236,6 +258,7 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 }
 func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 	res := r.FormValue("response")
+	fmt.Println(res)
 	obj := response{}
 	json.Unmarshal([]byte(res), &obj)
 	
@@ -250,8 +273,6 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 	if e != nil {	
 		fmt.Println("not OK")	
 		return
-	} else {
-		fmt.Println("OK")
 	}
 	for i , v := range obj.Ans {
 		query = "insert into "+tableName+" values (?, ?, ?)" 
@@ -260,7 +281,7 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w,"not OK",i)
 		}
 	}
-	
+	fmt.Fprintf(w, "OK")
 }
 func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
@@ -296,7 +317,7 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 		for rows1.Next() {
 			err = rows1.Scan(&tans)
 			if err != nil {
-				log.Print(err)
+			log.Print(err)
 			}
 			ans = append (ans, tans)
 		}
@@ -309,6 +330,57 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, string(resJson))
 	
+}
+func changeDataHandler(w http.ResponseWriter, r *http.Request) {
+	tname := r.FormValue("testName")
+	otype := r.FormValue("type")
+	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
+	if err = db.Ping(); err != nil {
+		log.Print(err)
+	}
+	defer db.Close()
+	if string(otype) == "rename" {
+		newTestName := r.FormValue("newTestName")
+		if newTestName != "" && tname != "" {
+			renameTest(tname,newTestName)
+			fmt.Fprintf(w, "Rename Called")
+		}
+	}
+	if string(otype) == "DELETE" {
+		if string(tname) == "" {
+			fmt.Fprintf(w, "Test Name Not Received")
+			return
+		}
+		fmt.Println(tname)
+		query1 := "DROP TABLE "+tname
+		query2 := "DROP TABLE "+tname+"response"
+		query3 := "DELETE FROM testDetails where testName= ?"
+		_, e1 := db.Exec(query1)
+		_, e2 := db.Exec(query2)
+		_, e3 := db.Exec(query3,tname)
+		if e1 != nil && e2 != nil && e3 != nil {
+			fmt.Fprintf(w, "Operation Done")
+		} else {
+			fmt.Fprintf(w, "some Error occured")		
+		}
+		return
+		
+	} else if string(otype) == "status"{
+		var status string
+		
+		if string(r.FormValue("status")) == "1" {
+			status = "ONLINE"
+		} else {
+			status = "OFFLINE"
+		}
+		query := "UPDATE testDetails set status = ? where testName = ? "
+		fmt.Print(query,status)
+		_, e := db.Exec(query,status,tname)
+		if e != nil {
+			log.Print(e)
+		}
+		fmt.Fprintf(w, tname + " is " + status);
+	}
 }
 func getAns(testName string) []string{
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
@@ -334,7 +406,7 @@ func getAns(testName string) []string{
 	}
 	return ans
 }
-func fetchTest() string {
+func fetchTest(c int) string {
 	//fmt.Println("a")
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
@@ -343,7 +415,13 @@ func fetchTest() string {
 	defer db.Close()
 	var name, no string
 	objArr := make([]testList, 0, 10)
-	rows, errs := db.Query("select testName, noOfQues from testDetails")
+	q := ""
+	if c == 1 {
+		q = "select testName, noOfQues from testDetails"	
+	} else {
+		q = "select testName, noOfQues from testDetails where status = 'ONLINE'"
+	}
+	rows, errs := db.Query(q)
 	if errs != nil {
 		log.Print(err)
 	}
@@ -364,6 +442,23 @@ func fetchTest() string {
 	}
 
 	return string(tjson)
+}
+func renameTest(oldName string, newName string) {
+	//fmt.Println("a")
+	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
+	if err = db.Ping(); err != nil {
+		log.Print(err)
+	}
+	defer db.Close()
+	q1 := "RENAME TABLE "+oldName+" TO "+newName
+	q2 := "RENAME TABLE "+oldName+"response TO "+newName+"response" 	
+	q3 := "update testDetails set testName = '"+newName+"' where testName = '"+oldName+"'"
+	_, e1 := db.Exec(q1)
+	_, e2 := db.Exec(q2)
+	_, e3 := db.Exec(q3)
+	if e1 != nil || e2 != nil || e3 != nil {
+		log.Print(e1,e2,e3)
+	}
 }
 func fetchTestData(testName string) string {
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
@@ -398,5 +493,6 @@ func main() {
 	http.HandleFunc("/saveToTest/",saveToTestHandler)
 	http.HandleFunc("/saveResponse/",saveResponseHandler)
 	http.HandleFunc("/showResult/",showResultHandler)
+	http.HandleFunc("/changeData/",changeDataHandler)
 	http.ListenAndServe(":80", nil)
 }

@@ -1,0 +1,521 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="css/bootstrap-theme.css"/>
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js" type="text/javascript"></script>
+		<script src="js/bspage.js"></script>
+		<script src="js/script.js"></script>
+	</head>
+	<body>
+		<div id="top">
+			<span id="logo">Class Room Response System</span>
+		</div>
+		<div id="test"></div>
+		<div id="bottomPanel" class="container-fluid">
+			<div class="row">
+				<div id="bottomPanelElementOuter" class="col-md-6 col-md-offset-3">
+					<div class="circle"><span class="glyphicon glyphicon-remove" onclick="testRemove()"></div>
+					<div class="circle"><span class="glyphicon glyphicon-play" onclick="testStart()"></div>
+					<div class="circle"><span class="glyphicon glyphicon-stop" onclick="testStop()"></div>
+					<div class="circle"><span class="glyphicon glyphicon-pencil" onclick="testRename()"></div>
+				</div>
+			</div>
+		</div>
+		<div id="overlay" class="container">
+			<div id="outerFirst"class="row">
+			<div id="listTestOuter1" class="col-md-6 col-md-offset-3">
+				<h3>Tests Available</h3>
+				<div class="list-group" id="listTest1">
+  					<div type="button" class="list-group-item" name="test">Test<span class="badge">12</span><span class="testIcons"><span class="glyphicon glyphicon-play-circle" onclick="testStart(this)"></span><span class="glyphicon glyphicon-stop" onclick="testStop(this)"></span><span></div>
+  					<button type="button" name="test2" class="list-group-item testBtn1">Test2</button>
+  					<button type="button" name="test3" class="list-group-item testBtn1">Test3</button>
+  					<button type="button" name="test4" class="list-group-item testBtn1">Test4</button>
+  					<button type="button" name="chem" class="list-group-item">Chemistry</button>
+				</div>
+				<button class="btn btn-success col-md-6 col-md-offset-3" id="hideOverlayBtn">Go to Dashboard</button>
+			</div>
+			<div class="row">
+				
+			</div>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-3 col-md-3" id="panel">
+					<br>
+					<div class="panel panel-primary">
+  						<!-- Default panel contents -->
+ 							 <div class="panel-heading " id="testHead"><b>Tests Available</b></div>
+  					
+					<div class="list-group" id="listTest">
+  						<button type="button" class="list-group-item">Test</button>
+  						<button type="button" class="list-group-item">Test2</button>
+  						<button type="button" class="list-group-item">Test3</button>
+  						<button type="button" class="list-group-item">Test4</button>
+  						<button type="button" class="list-group-item">Chemistry</button>
+					</div></div>
+					<button type="button" id="btnNew" class="btn btn-info"  data-toggle="modal" data-target="#myModal">Create New Test</button>
+				</div>
+				<div class="col-lg-9 col-md-9 form-group" id="quesplane">
+					<nav class="navbar navbar-default">
+						<div class="container-fluid">
+							<div class="navbar-header">
+      								<a class="navbar-brand" href="#" >Question No : <span id="questionNo"> 1 </span></a>
+    							</div>
+							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      								<ul class="nav navbar-nav">
+        								<li class="dropdown">
+          									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Answer Type<span class="caret"></span></a>
+          									<ul class="dropdown-menu">
+            										<li><a href="#" id="ddTextType">Textual type</a></li>
+            										<li><a href="#" id="ddImageType">Image type</a></li>
+          									</ul>
+        								</li>
+      								</ul>
+								<ul class="nav navbar-nav navbar-right">
+									<li><a href="#" id="navTestName">Test Name</a></li>
+								</ul>
+    							</div><!-- /.navbar-collapse -->
+  						</div><!-- /.container-fluid -->
+					</nav>
+					<form enctype="multipart/form-data" id="myform" action="saveToTest/" method="POST">
+						<label for="ques">Question:</label>
+						<textarea placeholder="Question here" name="ques" id="ques" class="form-control" rows="5" name="textcontent"></textarea><br><br>
+						<div class="row" id="textAnswer">
+						<div class=" col-lg-3 col-md-3">
+							<input type="text" id="option1" name="option1" placeholder="option1" class="form-control"/>
+						</div>
+						<div class=" col-lg-3 col-md-3">
+							<input type="text" id="option2" name="option2" placeholder="option2" class="form-control"/>
+						</div>
+						<div class=" col-lg-3 col-md-3">
+							<input type="text" id="option3" name="option3" placeholder="option3" class="form-control"/>
+						</div>
+						<div class=" col-lg-3 col-md-3">		
+							<input type="text" id="option4" name="option4" placeholder="option4" class="form-control"/>
+						</div>
+						</div>
+						<input type="hidden" name="type" id="qtype"/>
+						<input type="hidden" name="id" id="imageId"/>
+						<input type="hidden" name="testName" id="testNameInput"/>
+						<div class="row" id="imageAnswer">
+							<div class=" col-lg-3 col-md-3">
+								<label for="imgOption1">Option 1</label>
+								<input type="file" name="imageoption1" id="imgOption1"/>
+							</div>
+							<div class=" col-lg-3 col-md-3">
+								<label for="imgOption1">Option 2</label>
+								<input type="file" name="imageoption2" id="imgOption2"/>
+							</div>
+							<div class=" col-lg-3 col-md-3">
+								<label for="imgOption1">Option 3</label>
+								<input type="file" name="imageoption3" id="imgOption3"/>
+							</div>
+							<div class=" col-lg-3 col-md-3">		
+								<label for="imgOption1">Option 4</label>
+								<input type="file" name="imageoption4" id="imgOption4"/>
+							</div>
+						</div>
+					
+						<br><br>
+						Correct Answer
+						<select class="selectpicker" name="ans" id="ans" data-style="btn-info">
+							<option value="option1" selected >Option1</option>
+							<option value="option2" >Option2</option>
+							<option value="option3" >Option3</option>
+							<option value="option4" >Option4</option>
+						</select>
+						<input type="submit" value="upload"  id="uploadbtn1"/>
+					</form>
+					<br>
+					<div id="submitDiv">
+						<button id="btnSubmit">submit</button>
+					</div>		
+					<div class="row" id="pg">			
+						<div class="pagination" class="offset-lg-3 offset-md-4"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="notification" class="container-fluid">
+			<div class="row">
+				<div class="col-lg-4"></div>
+				<div class="col-lg-4" id="notificationArea"></div>
+				<div class="col-lg-4"></div>			
+			</div>		
+		</div>
+		
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">New Test</h4>
+      </div>
+      <div class="modal-body">
+      	<input type="text" class="form-control" placeholder="Test name" id="newTestName" onkeyup="checkTest(value)"><br>
+	<input type="text" class="form-control" placeholder="Number of questions" id="newNoOfQues"><br>
+	<div id="modalNotification">Status</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="btnCreateNew">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+	</body>
+	<style>
+		#panel{
+			background-color:#fff;
+		}
+		#test{ 
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background-color:aqua;
+		}
+		#top{
+			height:50px;
+			background-color:#00AE6D;
+			padding-left:5%;
+			color: #fff;
+			font-size: 30px;
+			font-weight: bold;
+		}
+		#newTestOuter{
+			padding-top:5%;
+		}
+		#quesplane{
+			padding:2%;
+		}
+		#submitDiv{
+			width:100%;
+			text-align:center;
+		}
+		#btnSubmit{
+			background-color:#00AE6D;
+			text-transform: uppercase;
+			outline: 0;
+  			background: #4CAF50;
+  			width: 100%;
+  			border: 0;
+  			padding: 15px;
+  			color: #FFFFFF;
+  			font-size: 14px;
+  			-webkit-transition: all 0.3 ease;
+  			transition: all 0.3 ease;
+  			cursor: pointer;
+			border-radius: 6px;
+		}
+		#btnNew{
+			width:100%;	
+		}
+		#testHead{
+			size:19px;
+		}
+		#modalNotification{
+			width:100%;
+			text-align:center;
+		}
+		#btnSubmit{
+			width:300px;
+		}
+		#pg{	
+			width:100%;	
+			padding-left:40%;	
+		}
+		#overlay {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background-color:#00AE6D;
+			z-index:5;
+		}
+		.testIcons{
+			padding:5px;
+			float:right;
+		}
+		.glyphicon{
+			margin-left:8px;
+			margin-right:8px;		
+		}
+		#outerFirst{
+			margin-top:3%;
+			padding:20px;
+			
+		}
+		#listTestOuter1{
+			padding:20px;
+			background-color:#e0e0d1;
+			border-color:#3d3d29;
+			border-style: solid;
+			border-radius: 10px;
+		}
+		h3 {
+       			opacity: 0.8;
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		#notification{
+			height:28px;
+			position:fixed;
+			bottom:0%;
+			width:100%; 
+			display:none;
+			z-index:15;
+			opacity:0.8;
+		}
+		#notificationArea{
+			background-color:#222;
+			color:#FFF;
+			size:15px;
+			text-align: center;
+			border-radius: 10px 10px 0px 0px;
+			font-size: 20px;
+		}
+		#bottomPanel{
+			background-color:#222;
+			height:60px;
+			position:fixed;
+			bottom:0%;
+			width:100%;
+			z-index:20;
+			opacity:0.8;
+			text-align: center;
+		}
+		.circle {
+			margin:5px;
+			display: inline-block;  			
+			width: 55px;
+  			height: 55px;
+  			border-radius: 50%;
+  			font-size: 30px;
+  			color: #fff;
+  			text-align: center;
+			margin-left:5%;
+			margin-right:5%;
+			border:solid 3px #455A64;
+			padding-top: 10px;
+		}
+		.circle:hover{
+			background-color:#455A64;
+		}
+		#bottomPanelElementOuter{
+			
+		}
+	
+	</style>
+	<script>
+		var TestName = "NONE";
+		var No = 0;
+		var th = $("#test").height();
+		var toph = $("#top").height();
+		$("#test").hide();
+		$("#imageAnswer").hide();
+		$("#panel").height(th - toph);
+		$("#uploadbtn1").hide();
+		$("#bottomPanel").hide();
+		//$("#overlay").height(th - toph);
+		isImage = false;
+		$("#ddTextType").on("click",function(){
+			$("#imageAnswer").hide();
+			$("#textAnswer").show();
+			isImage=false;	
+			$("#qtype").val("text");
+		});
+		$("#ddImageType").on("click",function(){
+			$("#imageAnswer").show();
+			$("#textAnswer").hide();
+			isImage=true;	
+			$("#qtype").val("image");
+		});
+		function btnTestList1(a){
+			TestName = a.getAttribute("name");
+			//alert(TestName);
+			bottomPanel();
+		}
+		$.post('getData/', { getTest:"yes",allTest:"YES" }, function(result) {
+    			var jsonData = JSON.parse(result);
+			s = "";
+			m = "";
+			for (var i = 0; i < jsonData.length; i++) {
+    			//	console.log(counter.counter_name);
+				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" onclick="testClicked(this)">'+ jsonData[i].name +' <span class="badge">'+jsonData[i].no +'</span></button>';
+				//alert(jsonData[i].name);
+				m = m + '<button type="button" class="list-group-item" onclick=btnTestList1(this) name="'+jsonData[i].name+'">'+jsonData[i].name+'<span class="badge">'+jsonData[i].no +'</span></button>';
+			}	
+			$("#listTest").html(s);
+			$("#listTest1").html(m);
+		});
+		$("#btnCreateNew").on("click",function(){
+			name = $("#newTestName").val();
+			no = $("#newNoOfQues").val();
+			$.post('createNewTest/', { testName:name, noOfQues:no }, function(result) {
+				if (result != "OK"){
+					$("#modalNotification").html("Test not created");
+				}else{
+					$("#modalNotification").html("Test created");
+				}
+			});
+		});
+		$("#btnSubmit").on("click", function(){
+			if (isImage){
+				uploadFile();
+				return;
+			}
+			ques = $("#ques").val();
+			o1 = $("#option1").val();
+			o2 = $("#option2").val();
+			o3 = $("#option3").val();
+			o4 = $("#option4").val();
+			ans = $("#ans").val();
+			//alert(ans);
+			$.post('saveToTest/', { testName:TestName, id:$("#questionNo").html(), ques:ques, option1:o1, option2:o2, option3:o3, option4:o4, ans:ans }, function(result) {
+				if (result.length < 5){
+					if (result <= No ){
+						$("#questionNo").html(result);
+						$(".form-control").val("");
+					}else {
+						notify("Completed");
+					}
+				}else{
+					alert(result);
+				}
+			});
+		});
+		
+		$("#hideOverlayBtn").on("click", function(){
+			//$("#hideOverlayBtn").removeClass("disabled");
+			$('#bottomPanel').slideUp(300);
+			if ( TestName == "NONE" ) {
+				notify("Select a Test");
+			} else {
+				$("#overlay").hide();
+				
+				//$(".form-control").prop('disabled', true);
+			}
+		});
+		function checkTest(name ){
+			$("#modalNotification").html(name);
+			$.post('getData/', { checkTest:name }, function(result) {
+				if (result == "present"){
+					$("#modalNotification").html("Test Name Used");
+				}else{
+					$("#modalNotification").html("Test Name Valid");
+				}
+			});
+		}
+		
+		function loadQues(id){
+			error = "NOT AVAILABLE";
+			$("#questionNo").html(id);
+			$.post('getQuestions/', { testName:TestName, id:id}, function(result) {
+				if (result == error){
+					$(".form-control").val("");
+				}else{
+					var json = JSON.parse(result);
+					$("#ques").val(json.question);
+					$("#option1").val(json.option1);
+					$("#option2").val(json.option2);
+					$("#option3").val(json.option3);
+					$("#option4").val(json.option4);
+					$("#ans").val(json.ans);
+					var res = json.option1.substring(0, 8);
+					$("#ddTextType").trigger("click");
+					if(res == "/images/"){
+						//notify("image type answers");
+						$("#ddImageType").trigger("click");
+					} 
+				}
+			});
+		}
+		setpage(4);
+		function setpage(total){
+			m = 4;
+			if (total > 12 )
+				m = total / 3;
+			$('.pagination').bootpag({
+       				total: total,
+       				maxVisible: m,
+				active: 3
+    				}).on('page', function(event, num){
+					No = num;
+        				loadQues(num); // or some ajax content loading...
+    			});
+
+		}
+		function testClicked(a) {
+			$(".form-control").prop('disabled', false);
+			TestName = a.getAttribute("name");
+			No = a.getAttribute("number");
+			setpage(No);
+			$("#navTestName").html(TestName);
+			$("#testNameInput").val(TestName);
+			loadQues(1);
+		}
+//file upload
+
+		function uploadFile(){
+			//alert("image");
+			$("#imageId").val($("#questionNo").html());
+			//$("#uploadbtn").trigger("click");
+			var formData = new FormData($('form')[0]);
+				$.ajax({
+        			url: 'saveToTest/',  //Server script to process data
+        			type: 'POST',
+					dataType: "multipart/form-data",
+        			
+        //Ajax events
+        			success: completeHandler,
+        // Form data
+        			data: formData,
+        //Options to tell jQuery not to process data or worry about content-type.
+        			cache: false,
+        			contentType: false,
+        			processData: false
+    			});
+		}
+		function completeHandler(){
+			alert("as");
+		}
+		function testRemove(){
+			a1 = confirm("delete "+TestName,"NO");
+			if (a1){
+				$.post('changeData/', { testName:testName, status:"DELETE"}, function(result) {
+					alert(result);
+				});
+			}
+		}
+		function testStart(){
+			alert("s");
+			$.post('changeData/', { testName:TestName, status:"1", type:"status"}, function(result) {
+				alert(result);
+			});
+		}
+		function testStop(){
+			$.post('changeData/', { testName:TestName, status:"0", type:"status"}, function(result) {
+				alert(result);
+			});
+		}
+		function testRename(){
+			a = prompt("Enter New Name","default");
+			$.post('changeData/', { testName:TestName, newTestName:a, type:"rename"}, function(result) {
+				alert(result);
+			});
+		}
+		function notify(s){
+			$("#notificationArea").html(s);
+			$('#notification').slideDown(300).delay(3000).slideUp(300);
+		}
+		function bottomPanel(){
+			$("#bottomPanel").html();
+			$('#bottomPanel').slideDown(300);//.delay(13000).slideUp(300);
+		}
+	</script>
+	
+</html>
