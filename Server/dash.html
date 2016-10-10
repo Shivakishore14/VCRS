@@ -15,10 +15,10 @@
 		<div id="bottomPanel" class="container-fluid">
 			<div class="row">
 				<div id="bottomPanelElementOuter" class="col-md-6 col-md-offset-3">
-					<div class="circle"><span class="glyphicon glyphicon-remove" onclick="testRemove()"></div>
-					<div class="circle"><span class="glyphicon glyphicon-play" onclick="testStart()"></div>
-					<div class="circle"><span class="glyphicon glyphicon-stop" onclick="testStop()"></div>
-					<div class="circle"><span class="glyphicon glyphicon-pencil" onclick="testRename()"></div>
+					<div class="circle" data-toggle="tooltip" data-placement="top" title="Remove Test"><span class="glyphicon glyphicon-remove" onclick="testRemove()"></div>
+					<div class="circle" data-toggle="tooltip" data-placement="top" title="Make Test Online"><span class="glyphicon glyphicon-play" onclick="testStart()"></div>
+					<div class="circle" data-toggle="tooltip" data-placement="top" title="Make Test Offline"><span class="glyphicon glyphicon-stop" onclick="testStop()"></div>
+					<div class="circle" data-toggle="tooltip" data-placement="top" title="Rename Test"><span class="glyphicon glyphicon-pencil" onclick="testRename()"></div>
 				</div>
 			</div>
 		</div>
@@ -36,7 +36,7 @@
 				<button class="btn btn-success col-md-6 col-md-offset-3" id="hideOverlayBtn">Go to Dashboard</button>
 			</div>
 			<div class="row">
-				
+
 			</div>
 			</div>
 		</div>
@@ -47,7 +47,7 @@
 					<div class="panel panel-primary">
   						<!-- Default panel contents -->
  							 <div class="panel-heading " id="testHead"><b>Tests Available</b></div>
-  					
+
 					<div class="list-group" id="listTest">
   						<button type="button" class="list-group-item">Test</button>
   						<button type="button" class="list-group-item">Test2</button>
@@ -65,16 +65,21 @@
     							</div>
 							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       								<ul class="nav navbar-nav">
-        								<li class="dropdown">
+										<li class="dropdown">
           									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Answer Type<span class="caret"></span></a>
           									<ul class="dropdown-menu">
             										<li><a href="#" id="ddTextType">Textual type</a></li>
             										<li><a href="#" id="ddImageType">Image type</a></li>
           									</ul>
+        								</li><li class="dropdown">
+          									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Level <span id="dispLevel"></span><span class="caret"></span></a>
+          									<ul class="dropdown-menu" id="levelDisplay">
+            										<li><a href="#" class="level" level="0">level 1</a></li>
+          									</ul>
         								</li>
       								</ul>
 								<ul class="nav navbar-nav navbar-right">
-									<li><a href="#" id="navTestName">Test Name</a></li>
+									<li><a href="#" id="navTestName">Select a test</a></li>
 								</ul>
     							</div><!-- /.navbar-collapse -->
   						</div><!-- /.container-fluid -->
@@ -92,12 +97,13 @@
 						<div class=" col-lg-3 col-md-3">
 							<input type="text" id="option3" name="option3" placeholder="option3" class="form-control"/>
 						</div>
-						<div class=" col-lg-3 col-md-3">		
+						<div class=" col-lg-3 col-md-3">
 							<input type="text" id="option4" name="option4" placeholder="option4" class="form-control"/>
 						</div>
 						</div>
 						<input type="hidden" name="type" id="qtype"/>
 						<input type="hidden" name="id" id="imageId"/>
+						<input type="hidden" name="level" id="hiddenDispLevel"/>
 						<input type="hidden" name="testName" id="testNameInput"/>
 						<div class="row" id="imageAnswer">
 							<div class=" col-lg-3 col-md-3">
@@ -112,12 +118,12 @@
 								<label for="imgOption1">Option 3</label>
 								<input type="file" name="imageoption3" id="imgOption3"/>
 							</div>
-							<div class=" col-lg-3 col-md-3">		
+							<div class=" col-lg-3 col-md-3">
 								<label for="imgOption1">Option 4</label>
 								<input type="file" name="imageoption4" id="imgOption4"/>
 							</div>
 						</div>
-					
+
 						<br><br>
 						Correct Answer
 						<select class="selectpicker" name="ans" id="ans" data-style="btn-info">
@@ -131,8 +137,8 @@
 					<br>
 					<div id="submitDiv">
 						<button id="btnSubmit">submit</button>
-					</div>		
-					<div class="row" id="pg">			
+					</div>
+					<div class="row" id="pg">
 						<div class="pagination" class="offset-lg-3 offset-md-4"></div>
 					</div>
 				</div>
@@ -142,10 +148,10 @@
 			<div class="row">
 				<div class="col-lg-4"></div>
 				<div class="col-lg-4" id="notificationArea"></div>
-				<div class="col-lg-4"></div>			
-			</div>		
+				<div class="col-lg-4"></div>
+			</div>
 		</div>
-		
+
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -158,7 +164,8 @@
       </div>
       <div class="modal-body">
       	<input type="text" class="form-control" placeholder="Test name" id="newTestName" onkeyup="checkTest(value)"><br>
-	<input type="text" class="form-control" placeholder="Number of questions" id="newNoOfQues"><br>
+		<input type="text" class="form-control" placeholder="Number of questions" id="newNoOfQues"><br>
+		<input type="text" class="form-control" placeholder="No of Level" id="newTestLevel"><br>
 	<div id="modalNotification">Status</div>
       </div>
       <div class="modal-footer">
@@ -173,7 +180,7 @@
 		#panel{
 			background-color:#fff;
 		}
-		#test{ 
+		#test{
 			position: absolute;
 			width: 100%;
 			height: 100%;
@@ -213,7 +220,7 @@
 			border-radius: 6px;
 		}
 		#btnNew{
-			width:100%;	
+			width:100%;
 		}
 		#testHead{
 			size:19px;
@@ -225,9 +232,9 @@
 		#btnSubmit{
 			width:300px;
 		}
-		#pg{	
-			width:100%;	
-			padding-left:40%;	
+		#pg{
+			width:100%;
+			padding-left:40%;
 		}
 		#overlay {
 			position: absolute;
@@ -242,12 +249,12 @@
 		}
 		.glyphicon{
 			margin-left:8px;
-			margin-right:8px;		
+			margin-right:8px;
 		}
 		#outerFirst{
 			margin-top:3%;
 			padding:20px;
-			
+
 		}
 		#listTestOuter1{
 			padding:20px;
@@ -265,9 +272,9 @@
 			height:28px;
 			position:fixed;
 			bottom:0%;
-			width:100%; 
+			width:100%;
 			display:none;
-			z-index:15;
+			z-index:20;
 			opacity:0.8;
 		}
 		#notificationArea{
@@ -290,7 +297,7 @@
 		}
 		.circle {
 			margin:5px;
-			display: inline-block;  			
+			display: inline-block;
 			width: 55px;
   			height: 55px;
   			border-radius: 50%;
@@ -306,13 +313,14 @@
 			background-color:#455A64;
 		}
 		#bottomPanelElementOuter{
-			
+
 		}
-	
+
 	</style>
 	<script>
 		var TestName = "NONE";
 		var No = 0;
+		var level = 0;
 		var th = $("#test").height();
 		var toph = $("#top").height();
 		$("#test").hide();
@@ -325,13 +333,13 @@
 		$("#ddTextType").on("click",function(){
 			$("#imageAnswer").hide();
 			$("#textAnswer").show();
-			isImage=false;	
+			isImage=false;
 			$("#qtype").val("text");
 		});
 		$("#ddImageType").on("click",function(){
 			$("#imageAnswer").show();
 			$("#textAnswer").hide();
-			isImage=true;	
+			isImage=true;
 			$("#qtype").val("image");
 		});
 		function btnTestList1(a){
@@ -348,14 +356,15 @@
 				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" onclick="testClicked(this)">'+ jsonData[i].name +' <span class="badge">'+jsonData[i].no +'</span></button>';
 				//alert(jsonData[i].name);
 				m = m + '<button type="button" class="list-group-item" onclick=btnTestList1(this) name="'+jsonData[i].name+'">'+jsonData[i].name+'<span class="badge">'+jsonData[i].no +'</span></button>';
-			}	
+			}
 			$("#listTest").html(s);
 			$("#listTest1").html(m);
 		});
 		$("#btnCreateNew").on("click",function(){
 			name = $("#newTestName").val();
 			no = $("#newNoOfQues").val();
-			$.post('createNewTest/', { testName:name, noOfQues:no }, function(result) {
+			l = $("#newTestLevel").val();
+			$.post('createNewTest/', { testName:name, noOfQues:no, level:l }, function(result) {
 				if (result != "OK"){
 					$("#modalNotification").html("Test not created");
 				}else{
@@ -374,8 +383,9 @@
 			o3 = $("#option3").val();
 			o4 = $("#option4").val();
 			ans = $("#ans").val();
+
 			//alert(ans);
-			$.post('saveToTest/', { testName:TestName, id:$("#questionNo").html(), ques:ques, option1:o1, option2:o2, option3:o3, option4:o4, ans:ans }, function(result) {
+			$.post('saveToTest/', { testName:TestName, id:$("#questionNo").html(), ques:ques, option1:o1, option2:o2, option3:o3, option4:o4, ans:ans, level: $("#dispLevel").html() }, function(result) {
 				if (result.length < 5){
 					if (result <= No ){
 						$("#questionNo").html(result);
@@ -384,20 +394,24 @@
 						notify("Completed");
 					}
 				}else{
-					alert(result);
+					//alert(result);
 				}
 			});
 		});
-		
+		$(".level").on("click", function(){
+			level = this.getAttribute("level");
+			$("#dispLevel").html(level);
+			$("#hiddenDispLevel").val(level);
+		});
 		$("#hideOverlayBtn").on("click", function(){
-			//$("#hideOverlayBtn").removeClass("disabled");
+			$("#hideOverlayBtn").removeClass("disabled");
 			$('#bottomPanel').slideUp(300);
 			if ( TestName == "NONE" ) {
 				notify("Select a Test");
 			} else {
 				$("#overlay").hide();
-				
-				//$(".form-control").prop('disabled', true);
+
+				$(".form-control").prop('disabled', true);
 			}
 		});
 		function checkTest(name ){
@@ -410,7 +424,7 @@
 				}
 			});
 		}
-		
+
 		function loadQues(id){
 			error = "NOT AVAILABLE";
 			$("#questionNo").html(id);
@@ -425,12 +439,14 @@
 					$("#option3").val(json.option3);
 					$("#option4").val(json.option4);
 					$("#ans").val(json.ans);
+					//$("#dispLevel").html(json.level);
+					//$("#hiddenDispLevel").val(json.level);
 					var res = json.option1.substring(0, 8);
 					$("#ddTextType").trigger("click");
 					if(res == "/images/"){
 						//notify("image type answers");
 						$("#ddImageType").trigger("click");
-					} 
+					}
 				}
 			});
 		}
@@ -469,7 +485,7 @@
         			url: 'saveToTest/',  //Server script to process data
         			type: 'POST',
 					dataType: "multipart/form-data",
-        			
+
         //Ajax events
         			success: completeHandler,
         // Form data
@@ -481,31 +497,31 @@
     			});
 		}
 		function completeHandler(){
-			alert("as");
+			//alert("as");
 		}
 		function testRemove(){
 			a1 = confirm("delete "+TestName,"NO");
 			if (a1){
 				$.post('changeData/', { testName:testName, status:"DELETE"}, function(result) {
-					alert(result);
+					notify(result);
 				});
 			}
 		}
 		function testStart(){
-			alert("s");
+			//alert("s");
 			$.post('changeData/', { testName:TestName, status:"1", type:"status"}, function(result) {
-				alert(result);
+				notify(result);
 			});
 		}
 		function testStop(){
 			$.post('changeData/', { testName:TestName, status:"0", type:"status"}, function(result) {
-				alert(result);
+				notify(result);
 			});
 		}
 		function testRename(){
 			a = prompt("Enter New Name","default");
 			$.post('changeData/', { testName:TestName, newTestName:a, type:"rename"}, function(result) {
-				alert(result);
+				notify(result);
 			});
 		}
 		function notify(s){
@@ -516,6 +532,9 @@
 			$("#bottomPanel").html();
 			$('#bottomPanel').slideDown(300);//.delay(13000).slideUp(300);
 		}
+		$(document).ready(function(){
+			$('[data-toggle="tooltip"]').tooltip();
+		});
 	</script>
-	
+
 </html>

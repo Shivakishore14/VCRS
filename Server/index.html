@@ -5,6 +5,9 @@
 		<link rel="stylesheet" href="css/style.css"/>
 	</head>
 	<body>
+		<div id="top">
+			<span id="logo">Class Room Response System</span>
+		</div>
 		<div class="login-page">
 			<div class="form">
 				<input id="uname" type="text" placeholder="username" name="username"/>
@@ -13,19 +16,57 @@
 				<p class="message">Forgot Password?  <a href="#"> Click here</a></p>
 			</div>
 		</div>
+		<div id="notification" class="container-fluid">
+			<div class="row">
+				<div class="col-lg-4"></div>
+				<div class="col-lg-4" id="notificationArea"></div>
+				<div class="col-lg-4"></div>
+			</div>
+		</div>
 	</body>
+	<style>
+		#top{
+			height:50px;
+			background-color:#00AE6D;
+			padding-left:5%;
+			color: #fff;
+			font-size: 30px;
+			font-weight: bold;
+		}
+		#notification{
+			height:28px;
+			position:fixed;
+			bottom:0%;
+			width:100%;
+			display:none;
+			z-index:20;
+			opacity:0.8;
+		}
+		#notificationArea{
+			background-color:#222;
+			color:#FFF;
+			size:15px;
+			text-align: center;
+			border-radius: 10px 10px 0px 0px;
+			font-size: 20px;
+		}
+	</style>
 	<script>
+	function notify(s){
+			$("#notificationArea").html(s);
+			$('#notification').slideDown(300).delay(3000).slideUp(300);
+		}
 	$("#btnLogin").on("click",function(){
 		var uname = $("#uname").val();
 		var pass = $("#password").val();
 		$.post('/login/', {username:uname, password:pass }, function(result) {
 	    		if (result == "INVALID"){
-				alert("invalid");				
+				notify("Invalid");
 			} else {
-				window.location = "http://localhost/dash.html";		
+				window.location = "dash.html";		
 			}
 		});
 	});
-	
+
 	</script>
 </html>

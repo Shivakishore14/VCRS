@@ -39,7 +39,7 @@ type response struct {
 	TestName string `json:"testname"`
 	Sid string `json:"sid"`
 	Ans []string `json:"ans"`
-	
+
 }
 type result struct {
 	a string
@@ -110,7 +110,7 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 	allTest := r.FormValue("allTest")
 	if status != "" && testName != "" {
 		db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-		if err = db.Ping(); err != nil {	
+		if err = db.Ping(); err != nil {
 			log.Print(err)
 		}
 		defer db.Close()
@@ -120,7 +120,7 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if getTest == "" && testName != "" && allTest == ""{
-		
+
 		//deleted code
 		resJson, erj := json.Marshal(getAns(testName))
 		if erj != nil {
@@ -152,7 +152,7 @@ func createNewTestHandler(w http.ResponseWriter, r *http.Request) {
 	_, e1 := db.Exec(q)
 	query := "CREATE TABLE IF NOT EXISTS "+testName+"response ( sid varchar(10), qno int, ans varchar(30))"
 	_, e1 	= db.Exec(query)
-	if e != nil || e1 != nil {	
+	if e != nil || e1 != nil {
 		fmt.Fprintf(w,"not OK")
 	} else {
 		fmt.Fprintf(w,"OK")
@@ -196,11 +196,11 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 		    fmt.Println(err)
 		    return
 		}
-		
+
 		f2, _ := os.OpenFile("."+option2, os.O_WRONLY|os.O_CREATE, 0666)
 		f3, _ := os.OpenFile("."+option3, os.O_WRONLY|os.O_CREATE, 0666)
 		f4, _ := os.OpenFile("."+option4, os.O_WRONLY|os.O_CREATE, 0666)
-		
+
 		defer f1.Close()
 		defer f2.Close()
 		defer f3.Close()
@@ -210,7 +210,7 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 		io.Copy(f3, file3)
 		io.Copy(f4, file4)
 	}
-	
+
 	fmt.Println("work akuthu " + ans)
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
@@ -228,7 +228,7 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 				log.Print(e)
 				fmt.Fprintf(w, "error inserting to table" + id)
 			} else {
-				
+
 			}
 		}else{
 			log.Print(eid)
@@ -241,9 +241,9 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print(e)
 			fmt.Fprintf(w, "error Updating table" + id)
 			return
-		} 
+		}
 	}
-	
+
 
 	var nextId int
 	row := db.QueryRow("SELECT id from "+testName+" ORDER BY id desc LIMIT 1 ");
@@ -254,28 +254,28 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(S)
 	fmt.Fprintf(w, S)
-	
+
 }
 func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 	res := r.FormValue("response")
 	fmt.Println(res)
 	obj := response{}
 	json.Unmarshal([]byte(res), &obj)
-	
+
 	tableName := obj.TestName + "response"
 	query := "CREATE TABLE IF NOT EXISTS "+tableName+"( sid varchar(10), qno int, ans varchar(30))"
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {	
+	if err = db.Ping(); err != nil {
 		log.Print(err)
 	}
 	defer db.Close()
 	_, e := db.Exec(query)
-	if e != nil {	
-		fmt.Println("not OK")	
+	if e != nil {
+		fmt.Println("not OK")
 		return
 	}
 	for i , v := range obj.Ans {
-		query = "insert into "+tableName+" values (?, ?, ?)" 
+		query = "insert into "+tableName+" values (?, ?, ?)"
 		_, e = db.Exec(query, obj.Sid, i+1, v )
 		if e != nil{
 			fmt.Fprintf(w,"not OK",i)
@@ -287,7 +287,7 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
 	trname := tname + "response"
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {	
+	if err = db.Ping(); err != nil {
 		log.Print(err,tname)
 	}
 	defer db.Close()
@@ -301,7 +301,7 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print(errs)
 	}
 	defer rows.Close()
-	for rows.Next() { 
+	for rows.Next() {
 		err := rows.Scan(&tstud)
 		if err != nil {
 			log.Print(err)
@@ -329,7 +329,7 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print(erj)
 	}
 	fmt.Fprintf(w, string(resJson))
-	
+
 }
 func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
@@ -343,7 +343,7 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 		newTestName := r.FormValue("newTestName")
 		if newTestName != "" && tname != "" {
 			renameTest(tname,newTestName)
-			fmt.Fprintf(w, "Rename Called")
+			fmt.Fprintf(w, "Rename Done")
 		}
 	}
 	if string(otype) == "DELETE" {
@@ -361,13 +361,13 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 		if e1 != nil && e2 != nil && e3 != nil {
 			fmt.Fprintf(w, "Operation Done")
 		} else {
-			fmt.Fprintf(w, "some Error occured")		
+			fmt.Fprintf(w, "some Error occured")
 		}
 		return
-		
+
 	} else if string(otype) == "status"{
 		var status string
-		
+
 		if string(r.FormValue("status")) == "1" {
 			status = "ONLINE"
 		} else {
@@ -397,7 +397,7 @@ func getAns(testName string) []string{
 	defer rows.Close()
 	var ta string
 	ans := make([]string,0,100)
-	for rows.Next() { 
+	for rows.Next() {
 		err := rows.Scan(&ta)
 		if err != nil {
 			log.Print(err)
@@ -417,7 +417,7 @@ func fetchTest(c int) string {
 	objArr := make([]testList, 0, 10)
 	q := ""
 	if c == 1 {
-		q = "select testName, noOfQues from testDetails"	
+		q = "select testName, noOfQues from testDetails"
 	} else {
 		q = "select testName, noOfQues from testDetails where status = 'ONLINE'"
 	}
@@ -451,7 +451,7 @@ func renameTest(oldName string, newName string) {
 	}
 	defer db.Close()
 	q1 := "RENAME TABLE "+oldName+" TO "+newName
-	q2 := "RENAME TABLE "+oldName+"response TO "+newName+"response" 	
+	q2 := "RENAME TABLE "+oldName+"response TO "+newName+"response"
 	q3 := "update testDetails set testName = '"+newName+"' where testName = '"+oldName+"'"
 	_, e1 := db.Exec(q1)
 	_, e2 := db.Exec(q2)
@@ -494,5 +494,5 @@ func main() {
 	http.HandleFunc("/saveResponse/",saveResponseHandler)
 	http.HandleFunc("/showResult/",showResultHandler)
 	http.HandleFunc("/changeData/",changeDataHandler)
-	http.ListenAndServe(":80", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
