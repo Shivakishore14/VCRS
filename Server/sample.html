@@ -74,6 +74,7 @@
 		$("#panel").height(th);
 
 		var ansarray = new Array();
+		var levelarray = new Array();
 		//checkTest();
 		function checkTest(){
 			var obj = {};
@@ -99,68 +100,17 @@
 			}
 			$("#listTest").html(s);
 		});
-		function processJson(json) {
-			//alert(json);
-			obj = JSON.parse(json);
-			s="";
-			for (i in obj) {
-				s = s + "<tr> <td> "+ obj[i].sid + "</td>";
-				for (j in obj[i].ans) {
-					s = s + "<td> " + obj[i].ans[j] +"</td>";
-				}
-				s = s + "<td></td></tr>";
-			}
-			$("#tresult").html(s);
-		}
-		function checkAns(){
-			var a = $("tr");
-			var l = a[0].cells.length;
-			color = "white";
-			for (var i = 1 ; i < a.length  ; i++) {
-				correct = 0 ;
-				for ( var j = 1; j < l; j++) {
-					//alert(i);
-					if (j == l - 1) {
-						a[i].cells[j].innerHTML = correct;
-					} else {
-						var ans1 = (a[i].cells[j].innerHTML).trim();
-						var ans2 = (a[0].cells[j].innerHTML).trim();
-						//alert(ans2);
-						if(ans1 == ans2){
-							color = "green";
-							correct = correct + 1;
-						}else {
-							color = "red";
-						}
-						a[i].cells[j].style.color = color;
-					}
-				}
-			}
-		}
+		
 		function testClicked(a) {
 			TestName = a.getAttribute("name");
-			/*$.post('showResult/',{testName:TestName}, function(result) {
-				alert(result);
-				processJson(result);
-				$.post('getData/', { testName:TestName }, function(result) {
-					alert(result);
-					var a = JSON.parse(result);
-					s = "<thead><tr><td>sid\\ans</td>";
-					for (i in a ) {
-						s = s + "<td>"+a[i]+"</td>";
-					}
-					s = s + "<td>Correct Answers</td></tr></thead>";
-					a = $("#tresult").html();
-					$("#tresult").html(s+a);
-					checkAns();
-				});
-			});*/
 
 			$.post('getData/', { testName:TestName }, function(result) { // get correct Answers
 				//alert(result);
 				var a = JSON.parse(result);
-				ansarray = a;
-
+				for (i in a){
+					ansarray[i] = a[i].ans;
+					levelarray[i] = a[i].level;
+				}
 				$.post('showResult/',{testName:TestName}, function(result) { // get ans of stud
 
 						//alert(result);

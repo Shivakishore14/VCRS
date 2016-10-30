@@ -35,6 +35,10 @@ type testList struct {
 	No    string `json:"no"`
 	Level string `json:"level"`
 }
+type ansLevel struct {
+	Ans   string `json:"ans"`
+	Level string `json:"level"`
+}
 
 /*type testListArray struct {
 	arr TestList `json:"arr"`
@@ -415,29 +419,30 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, tname+" is "+status)
 	}
 }
-func getAns(testName string) []string {
+func getAns(testName string) []ansLevel {
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
 		log.Print(err)
 	}
 	defer db.Close()
 	fmt.Println(testName)
-	qAns := "select ans from " + testName
+	qAns := "select ans, level from " + testName
 	rows, errs := db.Query(qAns)
 	if errs != nil {
 		log.Print(errs)
 	}
 	defer rows.Close()
-	var ta string
-	ans := make([]string, 0, 100)
+	var ta, tl string
+	objList := make([]ansLevel, 0, 100)
 	for rows.Next() {
-		err := rows.Scan(&ta)
+		err := rows.Scan(&ta, &tl)
 		if err != nil {
 			log.Print(err)
 		}
-		ans = append(ans, ta)
+		obj := &ansLevel{Ans: ta, Level: tl}
+		objList = append(objList, *obj)
 	}
-	return ans
+	return objList
 }
 func fetchTest(c int) string {
 	//fmt.Println("a")
