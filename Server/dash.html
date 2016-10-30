@@ -353,9 +353,9 @@
 			m = "";
 			for (var i = 0; i < jsonData.length; i++) {
     			//	console.log(counter.counter_name);
-				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" onclick="testClicked(this)">'+ jsonData[i].name +' <span class="badge">'+jsonData[i].no +'</span></button>';
+				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" level="'+jsonData[i].level +'" onclick="testClicked(this)">'+ jsonData[i].name +' <span class="badge">'+jsonData[i].no +'</span></button>';
 				//alert(jsonData[i].name);
-				m = m + '<button type="button" class="list-group-item" onclick=btnTestList1(this) name="'+jsonData[i].name+'">'+jsonData[i].name+'<span class="badge">'+jsonData[i].no +'</span></button>';
+				m = m + '<button type="button" class="list-group-item" onclick=btnTestList1(this) name="'+jsonData[i].name+'"  level="'+jsonData[i].level +'" >'+jsonData[i].name+'<span class="badge">'+jsonData[i].no +'</span></button>';
 			}
 			$("#listTest").html(s);
 			$("#listTest1").html(m);
@@ -400,9 +400,12 @@
 		});
 		$(".level").on("click", function(){
 			level = this.getAttribute("level");
+			setLevel(level);
+		});
+		function setLevel(level){
 			$("#dispLevel").html(level);
 			$("#hiddenDispLevel").val(level);
-		});
+		}
 		$("#hideOverlayBtn").on("click", function(){
 			$("#hideOverlayBtn").removeClass("disabled");
 			$('#bottomPanel').slideUp(300);
@@ -433,12 +436,14 @@
 					$(".form-control").val("");
 				}else{
 					var json = JSON.parse(result);
+					//alert(result);
 					$("#ques").val(json.question);
 					$("#option1").val(json.option1);
 					$("#option2").val(json.option2);
 					$("#option3").val(json.option3);
 					$("#option4").val(json.option4);
 					$("#ans").val(json.ans);
+					setLevel(json.level);
 					//$("#dispLevel").html(json.level);
 					//$("#hiddenDispLevel").val(json.level);
 					var res = json.option1.substring(0, 8);
@@ -469,6 +474,13 @@
 			$(".form-control").prop('disabled', false);
 			TestName = a.getAttribute("name");
 			No = a.getAttribute("number");
+			l = a.getAttribute("level");
+			var nl = Number(l);
+			sl = "";
+			for(i = 1; i <= nl; i++){
+				sl = sl + '<li><a href="#" class="level" level="' + i + '">level ' + i + '</a></li>';
+			}
+			$("#levelDisplay").html(sl);
 			setpage(No);
 			$("#navTestName").html(TestName);
 			$("#testNameInput").val(TestName);
@@ -502,7 +514,8 @@
 		function testRemove(){
 			a1 = confirm("delete "+TestName,"NO");
 			if (a1){
-				$.post('changeData/', { testName:testName, status:"DELETE"}, function(result) {
+				alert(a1);
+				$.post('changeData/', { testName:TestName, type:"DELETE"}, function(result) {
 					notify(result);
 				});
 			}

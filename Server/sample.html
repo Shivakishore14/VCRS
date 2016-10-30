@@ -58,6 +58,13 @@
 		.table td {
 			text-align: center;
 		}
+		.green{
+			color: green;
+		}
+
+		.red{
+			color:red;
+		}
 	</style>
 	<script>
 		TestName = "sampleTest1"
@@ -65,6 +72,8 @@
 		$("#test").hide();
 		$("#imageAnswer").hide();
 		$("#panel").height(th);
+
+		var ansarray = new Array();
 		//checkTest();
 		function checkTest(){
 			var obj = {};
@@ -80,7 +89,8 @@
 		}
 
 		$.post('getData/', { getTest:"yes", allTest:"Yes"}, function(result) {
-    			var jsonData = JSON.parse(result);
+			//alert(result);
+    		var jsonData = JSON.parse(result);
 			s = "";
 			for (var i = 0; i < jsonData.length; i++) {
     			//	console.log(counter.counter_name);
@@ -129,11 +139,11 @@
 		}
 		function testClicked(a) {
 			TestName = a.getAttribute("name");
-			$.post('showResult/',{testName:TestName}, function(result) {
-
+			/*$.post('showResult/',{testName:TestName}, function(result) {
+				alert(result);
 				processJson(result);
-				//
 				$.post('getData/', { testName:TestName }, function(result) {
+					alert(result);
 					var a = JSON.parse(result);
 					s = "<thead><tr><td>sid\\ans</td>";
 					for (i in a ) {
@@ -144,11 +154,66 @@
 					$("#tresult").html(s+a);
 					checkAns();
 				});
+			});*/
+
+			$.post('getData/', { testName:TestName }, function(result) { // get correct Answers
+				//alert(result);
+				var a = JSON.parse(result);
+				ansarray = a;
+
+				$.post('showResult/',{testName:TestName}, function(result) { // get ans of stud
+
+						//alert(result);
+						processJsonAns(result);
+				});
 			});
 
 		}
+		function processJsonAns(json){
+			obj = JSON.parse(json);
 
+			s = "";
+			h = getAnsTableHead();
 
+			for (i in obj) {									//display student answers
+				s = s + "<tr> <td> "+ obj[i].sid + "</td>";
+				count = 0;
+				arrl =	ansarray.length;
+				ansl =  obj[i].ans.length
+				if (arrl != ansl){
+					alert("not equal");
+					if (arrl > ansl){
+						for (k = ansl; k <arrl;k++ )
+							obj[i].ans[k] = "N/A";
+					}else{
+						for (k = arrl; k <ansl;k++ )
+							ansarray[k] = "N/A";
+					}
+					h = getAnsTableHead();
+				}
+				for (j in obj[i].ans) {
+
+					color = "red";
+					if (ansarray[j] == obj[i].ans[j]){
+						color = "green";
+						count++;
+					}
+					s = s + "<td class="+color+"> " + obj[i].ans[j] +"</td>";
+				}
+				s = s + "<td> " + count +"</td></tr>";
+			}
+			$("#tresult").html( s);
+		}
+		function getAnsTableHead(){
+
+			s1 = "<thead><tr><td>sid\\ans</td>";					//display crct Answers
+			for (i in ansarray){
+				s1 = s1 + "<td>"+ansarray[i]+"</td>";
+			}
+			s1 = s1 + "<td>Correct Answers</td></tr></thead>";
+
+			return s1;
+		}
 	</script>
 
 </html>

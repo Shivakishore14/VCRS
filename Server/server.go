@@ -28,10 +28,12 @@ type question struct {
 	Option4 string `json:"option4"`
 	Ans     string `json:"ans"`
 	Type    string `json:"type"`
+	Level   string `json:"level"`
 }
 type testList struct {
-	Name string `json:"name"`
-	No   string `json:"no"`
+	Name  string `json:"name"`
+	No    string `json:"no"`
+	Level string `json:"level"`
 }
 
 /*type testListArray struct {
@@ -84,11 +86,11 @@ func getQuesHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.Ping(); err != nil {
 		log.Print(err)
 	}
-	var class, ques, op1, op2, op3, op4, ans string
+	var class, ques, op1, op2, op3, op4, ans, level string
 	defer db.Close()
 	q := "SELECT * FROM " + tName + " WHERE id = ?"
 	row := db.QueryRow(q, id)
-	e := row.Scan(&id, &class, &ques, &op1, &op2, &op3, &op4, &ans)
+	e := row.Scan(&id, &class, &ques, &op1, &op2, &op3, &op4, &ans, &level)
 	if e != nil {
 		fmt.Fprintf(w, "NOT AVAILABLE")
 		log.Println(e)
@@ -97,7 +99,7 @@ func getQuesHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(string(op1), "/images/") {
 		qtype = "image"
 	}
-	qobj := &question{Id: id, Class: class, Ques: ques, Option1: op1, Option2: op2, Option3: op3, Option4: op4, Ans: ans, Type: qtype}
+	qobj := &question{Id: id, Class: class, Ques: ques, Option1: op1, Option2: op2, Option3: op3, Option4: op4, Ans: ans, Type: qtype, Level: level}
 	qjson, je := json.Marshal(qobj)
 	if je != nil {
 		log.Print(je)
@@ -142,15 +144,23 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 func createNewTestHandler(w http.ResponseWriter, r *http.Request) {
 	testName := r.FormValue("testName")
-	no := r.FormValue("noOfQues")
+	no := string(r.FormValue("noOfQues"))
+	l := string(r.FormValue("level"))
+	if _, err := strconv.Atoi(no + l); err != nil {
+		fmt.Fprint(w, "Check number fields")
+		return
+	}
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
 		log.Print(err)
 	}
 	defer db.Close()
-	_, e := db.Exec("insert into testDetails values( ? , ? , '', '' )", testName, no)
+
+	// TODO: check test already present
+
+	_, e := db.Exec("insert into testDetails values( ? , ? , '', ? )", testName, no, l)
 	// code to create the table for the test
-	q := "CREATE TABLE " + testName + " ( id int NOT NULL AUTO_INCREMENT, class text, ques text, option1 text, option2 text, option3 text, option4 text,ans text, PRIMARY KEY (id)) "
+	q := "CREATE TABLE " + testName + " ( id int NOT NULL AUTO_INCREMENT, class text, ques text, option1 text, option2 text, option3 text, option4 text,ans text, level text, PRIMARY KEY (id)) "
 	_, e1 := db.Exec(q)
 	query := "CREATE TABLE IF NOT EXISTS " + testName + "response ( sid varchar(10), qno int, ans varchar(30))"
 	_, e1 = db.Exec(query)
@@ -170,6 +180,7 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 	option3 := r.FormValue("option3")
 	option4 := r.FormValue("option4")
 	ans := r.FormValue("ans")
+	level := r.FormValue("level")
 	fmt.Println(ques, "shit")
 	id = strings.TrimSpace(id)
 	testName = strings.TrimSpace(testName)
@@ -224,8 +235,8 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 	eid := rowId.Scan(&id)
 	if eid != nil {
 		if eid == sql.ErrNoRows {
-			query := "insert into " + testName + "(class, ques, option1, option2, option3, option4, ans) values( '' , ?, ? , ? , ? ,? , ? )"
-			_, e := db.Exec(query, ques, option1, option2, option3, option4, ans)
+			query := "insert into " + testName + "(class, ques, option1, option2, option3, option4, ans, level) values( '' , ?, ? , ? , ? ,? , ?, ? )"
+			_, e := db.Exec(query, ques, option1, option2, option3, option4, ans, level)
 			if e != nil {
 				log.Print(e)
 				fmt.Fprintf(w, "error inserting to table"+id)
@@ -237,8 +248,8 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "error Connecting to table"+id)
 		}
 	} else {
-		query := "UPDATE " + testName + " SET ques=?, option1=?, option2=?, option3=?, option4=?, ans=? where id = ?"
-		_, e := db.Exec(query, ques, option1, option2, option3, option4, ans, id)
+		query := "UPDATE " + testName + " SET ques=?, option1=?, option2=?, option3=?, option4=?, ans=?, level=? where id = ?"
+		_, e := db.Exec(query, ques, option1, option2, option3, option4, ans, level, id)
 		if e != nil {
 			log.Print(e)
 			fmt.Fprintf(w, "error Updating table"+id)
@@ -351,6 +362,7 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
 	otype := r.FormValue("type")
+	fmt.Print(otype, " called")
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
 		log.Print(err)
@@ -380,9 +392,9 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 		_, e2 := db.Exec(query2)
 		_, e3 := db.Exec(query3, tname)
 		if e1 != nil && e2 != nil && e3 != nil {
-			fmt.Fprintf(w, "Operation Done")
-		} else {
 			fmt.Fprintf(w, "some Error occured")
+		} else {
+			fmt.Fprintf(w, "Operation Done")
 		}
 		return
 
@@ -434,13 +446,13 @@ func fetchTest(c int) string {
 		log.Print(err)
 	}
 	defer db.Close()
-	var name, no string
+	var name, no, level string
 	objArr := make([]testList, 0, 10)
 	q := ""
 	if c == 1 {
-		q = "select testName, noOfQues from testDetails"
+		q = "select testName, noOfQues, level from testDetails"
 	} else {
-		q = "select testName, noOfQues from testDetails where status = 'ONLINE'"
+		q = "select testName, noOfQues, level from testDetails where status = 'ONLINE'"
 	}
 	rows, errs := db.Query(q)
 	if errs != nil {
@@ -448,8 +460,8 @@ func fetchTest(c int) string {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&name, &no)
-		tobj := &testList{Name: name, No: no}
+		err := rows.Scan(&name, &no, &level)
+		tobj := &testList{Name: name, No: no, Level: level}
 		objArr = append(objArr, *tobj)
 
 		if err != nil {
