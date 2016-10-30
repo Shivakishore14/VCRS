@@ -310,10 +310,11 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	resL := make([]response, 0, 100)
 	//ans := getAns(tname);
 	var tstud, tans string
-	qSud := "select distinct sid from " + trname
+	qSud := "select distinct sid from " + trname + " ORDER BY sid ASC;"
 	rows, errs := db.Query(qSud)
 	if errs != nil {
 		log.Print(errs)
+		fmt.Println(trname)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -323,6 +324,7 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		stud = append(stud, tstud)
 		ans := make([]string, 0, 100)
+		//fmt.Println(trname)
 		qans := "select ans from " + trname + " where sid = ?"
 		rows1, errs1 := db.Query(qans, tstud)
 		if errs1 != nil {
@@ -356,7 +358,7 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	if string(otype) == "rename" {
 		newTestName := r.FormValue("newTestName")
-		if newTestName.ContainsAny(" ") {
+		if strings.ContainsAny(newTestName, " ") {
 			fmt.Fprintf(w, "No spaces allowed")
 			return
 		}
