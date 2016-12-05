@@ -55,7 +55,8 @@
   						<button type="button" class="list-group-item">Test4</button>
   						<button type="button" class="list-group-item">Chemistry</button>
 					</div></div>
-					<button type="button" id="btnNew" class="btn btn-info"  data-toggle="modal" data-target="#myModal">Create New Test</button>
+					<button type="button" id="btnNew" class="btn btn-info"  data-toggle="modal" data-target="#myModal">Create New Test</button><br>
+					<button type="button" id="btnGoToResults" class="btn btn-info">Results</button>
 				</div>
 				<div class="col-lg-9 col-md-9 form-group" id="quesplane">
 					<nav class="navbar navbar-default">
@@ -219,8 +220,9 @@
   			cursor: pointer;
 			border-radius: 6px;
 		}
-		#btnNew{
+		#btnNew ,#btnGoToResults{
 			width:100%;
+			margin: 0px 0px 10px 0px;
 		}
 		#testHead{
 			size:19px;
@@ -371,6 +373,9 @@
 					$("#modalNotification").html("Test created");
 				}
 			});
+		});
+		$("#btnGoToResults").on('click',function(){
+			window.location.href = 'sample.html';
 		});
 		$("#btnSubmit").on("click", function(){
 			if (isImage){

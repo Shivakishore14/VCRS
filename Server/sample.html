@@ -34,14 +34,21 @@
 					<h2> Test Responses</h2>
 					<table class="table table-striped table-bordered" id="tresult">
 					</table>
-					<div id="chart_div" style="width: 100%; height: 500px;"></div>
-					<button class="btn btn-success" onclick="chartViewOn()">show Chart</button>
-					<div id="status">
+					<button class="btn btn-success" id="btnChart" onclick="chartViewOn()">show Chart</button>
+
+					<div id="status" class="row">
+						<div class="col-md-6">
+							<div id="chart_div" style="width:900px; height: 900px;"></div>
+						</div>
+						<div class="col-md-6">
+							<div id="chart_div2"></div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
 
 	</body>
 	<style>
@@ -72,6 +79,10 @@
 		.red{
 			color:red;
 		}
+		th{
+			align-items: center;
+			text-align: center;
+		}
 	</style>
 	<script>
 		TestName = "sampleTest1"
@@ -79,10 +90,25 @@
 		$("#test").hide();
 		$("#imageAnswer").hide();
 		$("#panel").height(th);
-		$("#chart_div").hide();
+		var stuNo = 0;
 		var ansarray = new Array();
 		var levelarray = new Array();
 		var ansstat = new Array();
+		function contains(a,v) {
+		    for(var i = 0; i < a.length; i++) {
+		        if(a[i] === v) return true;
+		    }
+		    return false;
+		};
+		function unique(a) {
+		    var arr = [];
+		    for(var i = 0; i < a.length; i++) {
+		        if(!contains(arr, a[i])) {
+		            arr.push(a[i]);
+		        }
+		    }
+		    return arr;
+		}
 		//checkTest();
 		function checkTest(){
 			var obj = {};
@@ -108,10 +134,13 @@
 			}
 			$("#listTest").html(s);
 		});
-
+		var levelObj = {};
+		var levelObjAns = {};
+		var levelObjCount = {};
 		function testClicked(a) {
 			TestName = a.getAttribute("name");
-
+			$("#btnChart").show();
+			$("#status").hide();
 			$.post('getData/', { testName:TestName }, function(result) { // get correct Answers
 				//alert(result);
 				var a = JSON.parse(result);
@@ -120,7 +149,15 @@
 					levelarray[i] = a[i].level;
 					ansstat[i] = [0,0,0,0,0];
 				}
-				//console.log(ansstat);
+				u = unique(levelarray);
+				for ( i in u ){
+					levelObj[u[i]] = 0;
+					levelObjAns[u[i]] = 0;
+				}
+				for (i in levelarray){
+					levelObj[levelarray[i]] = levelObj[levelarray[i]] + 1;
+				}
+				console.log(levelObj);
 				$.post('showResult/',{testName:TestName}, function(result) { // get ans of stud
 
 						//alert(result);
@@ -135,7 +172,7 @@
 
 			s = "";
 			h = getAnsTableHead();
-
+			stuNo = obj.length;
 			for (i in obj) {									//display student answers
 				s = s + "<tr> <td> "+ obj[i].sid + "</td>";
 				count = 0;
@@ -157,7 +194,9 @@
 
 					color = "red";
 					ansstat[j][getOptionNum(obj[i].ans[j])]++;
+					//console.log(ansarray[j]);
 					if (ansarray[j] == obj[i].ans[j]){
+						levelObjAns[levelarray[j]] = levelObjAns[levelarray[j]] + 1;
 						color = "green";
 						count++;
 					}
@@ -166,6 +205,8 @@
 				s = s + "<td> " + count +"</td></tr>";
 			}
 			$("#tresult").html(h + s);
+			console.log(stuNo);
+			levelStat();
 		}
 		function getAnsTableHead(){
 
@@ -189,8 +230,23 @@
 		}
 
 		function chartViewOn(){
-			$('#chart_div').show();
+			$("#status").show();
 			$('tresult').hide();
+			$("#btnChart").hide();
+		}
+		function levelStat(){
+			s = '<table  class="table table-striped table-bordered" ><thead><tr><th>Level</th><th>Percentage</th></tr></thead>'
+			for (i in levelObj){
+				max = levelObj[i] * stuNo;
+				ans = levelObjAns[i];
+				percent = ans/max * 100;
+				percent = Math.round(percent * 100) / 100
+				console.log(i);
+				s = s + "<tr><td>level"+i+"</td><td>"+percent+"%</td></tr>";
+			}
+			s = s +"</table>"
+			//alert(s);
+			$("#chart_div2").html(s);
 		}
 		function showStatus(){
 			chartData = [];

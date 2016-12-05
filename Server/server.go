@@ -52,31 +52,41 @@ type result struct {
 	a string
 }
 
-func isLoginValid(username string, pass string) bool {
+func isLoginValid(username string, pass string, table string) (string, bool) {
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
 		log.Print(err)
-		return false
+		return "", false
 	}
 	var name string
 	defer db.Close()
-	row := db.QueryRow("SELECT username FROM staff WHERE password=? AND username=?", pass, username)
+	row := db.QueryRow("SELECT username FROM "+table+" WHERE password=? AND username=?", pass, username)
 	e := row.Scan(&name)
 	if e != nil {
 		log.Println(e)
-		return false
+		return "INVALID", false
 	}
 	if name == username {
-		return true
+		return name, true
 	}
-	return false
+	return "INVALID", false
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	pass := r.FormValue("password")
-	isValid := isLoginValid(username, pass)
+	_, isValid := isLoginValid(username, pass, "staff")
 	if isValid {
 		fmt.Fprintf(w, "Logged In")
+	} else {
+		fmt.Fprintf(w, "INVALID")
+	}
+}
+func stuLoginHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	pass := r.FormValue("password")
+	name, isValid := isLoginValid(username, pass, "stuLogin")
+	if isValid {
+		fmt.Fprintf(w, name)
 	} else {
 		fmt.Fprintf(w, "INVALID")
 	}
@@ -290,11 +300,18 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("not OK")
 		return
 	}
+	fmt.Println("test1")
 	for i, v := range obj.Ans {
-		query = "select * from " + tableName + "where sid = ? and qno = ?"
-		_, e = db.Exec(query, obj.Sid, i+1) //check if present
+		fmt.Println("test2")
+		query = "select sid from " + tableName + " where sid = ? and qno = ? LIMIT 1"
+		rowId := db.QueryRow(query, obj.Sid, i+1) //check if present
+		var temp string
+		e = rowId.Scan(&temp)
+
 		if e != nil {
+			fmt.Println("goes to err block", e)
 			if e == sql.ErrNoRows { //if not present
+				fmt.Println("not present block")
 				query = "insert into " + tableName + " values (?, ?, ?)"
 				_, e1 := db.Exec(query, obj.Sid, i+1, v)
 				if e1 != nil {
@@ -525,6 +542,7 @@ func main() {
 	fs := http.FileServer(http.Dir("."))
 	http.Handle("/", fs)
 	http.HandleFunc("/login/", loginHandler)
+	http.HandleFunc("/stuLogin/", stuLoginHandler)
 	http.HandleFunc("/getQuestions/", getQuesHandler)
 	http.HandleFunc("/getData/", getDataHandler)
 	http.HandleFunc("/createNewTest/", createNewTestHandler)
