@@ -468,6 +468,41 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	jsonResult, _ := json.Marshal(added)
 	fmt.Fprintf(w, string(jsonResult))
 }
+func changeLoginHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	newUsername := r.FormValue("newUsername")
+	oldPassword := r.FormValue("oldPassword")
+	newPassword := r.FormValue("newPassword")
+	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
+	if err = db.Ping(); err != nil {
+		log.Print(err)
+	}
+	defer db.Close()
+	msg := "try again"
+	sqlCheckPass := "SELECT password from staff where username = ?"
+	row := db.QueryRow(sqlCheckPass, username)
+
+	var tempPass string
+	e := row.Scan(&tempPass)
+	if e == nil {
+		if tempPass == oldPassword {
+			sqlUpdate := ""
+			if newUsername == "" {
+				sqlUpdate = "UPDATE staff set password = ? where username = ?"
+				fmt.Println("changing password")
+				_, e = db.Exec(sqlUpdate, newPassword, username)
+			} else {
+				fmt.Print("changing username")
+				sqlUpdate = "UPDATE staff set username = ? where username = ?"
+				_, e = db.Exec(sqlUpdate, newUsername, username)
+			}
+			if e == nil {
+				msg = "Done"
+			}
+		}
+	}
+	fmt.Fprintf(w, msg)
+}
 
 func getAns(testName string) []ansLevel {
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
@@ -584,5 +619,6 @@ func main() {
 	http.HandleFunc("/showResult/", showResultHandler)
 	http.HandleFunc("/changeData/", changeDataHandler)
 	http.HandleFunc("/register/", registerHandler)
+	http.HandleFunc("/changeLogin/", changeLoginHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
