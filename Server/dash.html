@@ -10,6 +10,13 @@
 	<body>
 		<div id="top">
 			<span id="logo">Class Room Response System</span>
+			<div class="dropdown pull-right" id="settings">
+            <span data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span><b class="caret"></b></span>
+            <ul class="dropdown-menu">
+                <li><a href="change.html">Change password</a></li>
+                <li><a href="addStudents.html">add user</a></li>
+            </ul>
+        </div>
 		</div>
 		<div id="test"></div>
 		<div id="bottomPanel" class="container-fluid">
@@ -317,7 +324,10 @@
 		#bottomPanelElementOuter{
 
 		}
-
+		#settings{
+			margin-right: 30px;
+			margin-top: 20px;
+		}
 	</style>
 	<script>
 		var TestName = "NONE";
