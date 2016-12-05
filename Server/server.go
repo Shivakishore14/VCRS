@@ -39,6 +39,11 @@ type ansLevel struct {
 	Ans   string `json:"ans"`
 	Level string `json:"level"`
 }
+type stuList struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
+}
 
 /*type testListArray struct {
 	arr TestList `json:"arr"`
@@ -436,6 +441,34 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, tname+" is "+status)
 	}
 }
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	jsonData := r.FormValue("list")
+	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
+	if err = db.Ping(); err != nil {
+		log.Print(err)
+	}
+	defer db.Close()
+
+	var list *[]stuList
+	added := make([]string, 0, 100)
+	json.Unmarshal([]byte(jsonData), &list)
+
+	for _, v := range *list {
+
+		sql := "INSERT into stuLogin(username, password, name) values(?, ?, ?)"
+		if v.Username != "" && v.Password != "" && v.Name != "" {
+			_, e := db.Exec(sql, v.Username, v.Password, v.Name)
+			if e == nil {
+				added = append(added, v.Name)
+			}
+			fmt.Println(v.Name, "-->", v.Password, "..", v.Username, sql)
+		}
+	}
+
+	jsonResult, _ := json.Marshal(added)
+	fmt.Fprintf(w, string(jsonResult))
+}
+
 func getAns(testName string) []ansLevel {
 	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
 	if err = db.Ping(); err != nil {
@@ -550,5 +583,6 @@ func main() {
 	http.HandleFunc("/saveResponse/", saveResponseHandler)
 	http.HandleFunc("/showResult/", showResultHandler)
 	http.HandleFunc("/changeData/", changeDataHandler)
+	http.HandleFunc("/register/", registerHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
