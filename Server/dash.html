@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<div id="top">
-			<span id="logo">Class Room Response System</span>
+			<span id="logo">V.C.R.S</span>
 			<div class="dropdown pull-right" id="settings">
             <span data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span><b class="caret"></b></span>
             <ul class="dropdown-menu">
@@ -365,9 +365,16 @@
 			m = "";
 			for (var i = 0; i < jsonData.length; i++) {
     			//	console.log(counter.counter_name);
-				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" level="'+jsonData[i].level +'" onclick="testClicked(this)">'+ jsonData[i].name +' <span class="badge">'+jsonData[i].no +'</span></button>';
+				stat = "";
+
+				if (jsonData[i].status == "ONLINE"){
+					stat = '<span class="badge alert-success">online</span>';
+				}else{
+					stat = '<span class="badge alert-warning">offline</span>';
+				}
+				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" level="'+jsonData[i].level +'" onclick="testClicked(this)">'+ jsonData[i].name +stat +' <span class="badge">'+jsonData[i].no +'</span></button>';
 				//alert(jsonData[i].name);
-				m = m + '<button type="button" class="list-group-item" onclick=btnTestList1(this) name="'+jsonData[i].name+'"  level="'+jsonData[i].level +'" >'+jsonData[i].name+'<span class="badge">'+jsonData[i].no +'</span></button>';
+				m = m + '<button type="button" class="list-group-item" onclick=btnTestList1(this) name="'+jsonData[i].name+'"  level="'+jsonData[i].level +'" >'+jsonData[i].name+stat +'<span class="badge">'+jsonData[i].no +'</span></button>';
 			}
 			$("#listTest").html(s);
 			$("#listTest1").html(m);
@@ -400,6 +407,10 @@
 			ans = $("#ans").val();
 
 			//alert(ans);
+			if ($("#dispLevel").html() == ""){
+				notify("select level");
+				return;
+			}
 			$.post('saveToTest/', { testName:TestName, id:$("#questionNo").html(), ques:ques, option1:o1, option2:o2, option3:o3, option4:o4, ans:ans, level: $("#dispLevel").html() }, function(result) {
 				if (result.length < 5){
 					if (result <= No ){
@@ -418,6 +429,7 @@
 			setLevel(level);
 		});
 		function setLevel(level){
+			console.log(level);
 			$("#dispLevel").html(level);
 			$("#hiddenDispLevel").val(level);
 		}
@@ -446,6 +458,8 @@
 		function loadQues(id){
 			error = "NOT AVAILABLE";
 			$("#questionNo").html(id);
+			$("#dispLevel").html("");
+			$("#hiddenDispLevel").val("");
 			$.post('getQuestions/', { testName:TestName, id:id}, function(result) {
 				if (result == error){
 					$(".form-control").val("");
@@ -493,7 +507,7 @@
 			var nl = Number(l);
 			sl = "";
 			for(i = 1; i <= nl; i++){
-				sl = sl + '<li><a href="#" class="level" level="' + i + '">level ' + i + '</a></li>';
+				sl = sl + '<li class="level"><a href="#" onclick="setLevel('+i+')" class="level" level="' + i + '">level ' + i + '</a></li>';
 			}
 			$("#levelDisplay").html(sl);
 			setpage(No);

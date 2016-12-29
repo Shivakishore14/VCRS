@@ -6,15 +6,21 @@
 	</head>
 	<body>
 		<div id="top">
-			<span id="logo">V.C.R.S</span>
+			<span id="logo">Admin Login</span>
 		</div>
-		<div class="login-page">
+		<div class="login-page" id="formRoot">
 			<div class="form">
 				<input id="uname" type="text" placeholder="username" name="username"/>
 				<input id="password" type="password" placeholder="password" name="password"/>
 				<button id="btnLogin">login</button>
 				<p class="message">Forgot Password?  <a href="#"> Click here</a></p>
 			</div>
+
+		</div>
+		<div>
+			<table id="table">
+
+			</table>
 		</div>
 		<div id="notification" class="container-fluid">
 			<div class="row">
@@ -50,6 +56,10 @@
 			border-radius: 10px 10px 0px 0px;
 			font-size: 20px;
 		}
+		#table{
+			border: solid 2px;
+			border: solid 1px;
+		}
 	</style>
 	<script>
 	function notify(s){
@@ -59,11 +69,20 @@
 	$("#btnLogin").on("click",function(){
 		var uname = $("#uname").val();
 		var pass = $("#password").val();
-		$.post('/login/', {username:uname, password:pass }, function(result) {
-	    		if (result == "INVALID"){
-				notify("Invalid");
+		$.post('/adminLogin/', {username:uname, password:pass }, function(result) {
+			//alert(result);
+			console.log(result);
+	    	if (result.length == 0){
+				alert("invalid");
 			} else {
-				window.location = "dash.html";
+
+				var o = JSON.parse(result);
+				s = "<tr><th>username</th><th>password</th></tr>";
+				for (i in o){
+					s = s + '<tr><td>'+o[i].username+'</td><td>'+o[i].password+'</td></tr>';
+				}
+				$("#table").html(s);
+				$("#formRoot").hide();
 			}
 		});
 	});
