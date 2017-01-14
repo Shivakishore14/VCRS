@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Test        
+Comment=MYApp
+Exec=bash -c '/home/gautham/PycharmProjects/IoT/start.sh;$SHELL'
+Icon=utilities-terminal
+Terminal=true 
+Type=Application
+Categories=Application;
+Name[en_IN]=CRS
