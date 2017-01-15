@@ -370,7 +370,7 @@
 				if (jsonData[i].status == "ONLINE"){
 					stat = '<span class="badge alert-success">online</span>';
 				}else{
-					stat = '<span class="badge alert-warning">offline</span>';
+					stat = '<span class="badge alert-danger">offline</span>';
 				}
 				s = s + '<button type="button" class="list-group-item" name="'+jsonData[i].name+'" number="'+jsonData[i].no +'" level="'+jsonData[i].level +'" onclick="testClicked(this)">'+ jsonData[i].name +stat +' <span class="badge">'+jsonData[i].no +'</span></button>';
 				//alert(jsonData[i].name);
