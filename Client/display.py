@@ -3,7 +3,6 @@ import login
 import urllib2
 import json
 
-
 from PyQt4 import QtCore, QtGui, uic
 
 qtCreatorFile = "questions.ui"
@@ -61,6 +60,8 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.radioButton3.setVisible(False)
         self.radioButton4.setVisible(False)
         self.pushButton_2.setVisible(False)
+        self.scrollArea_2.setVisible(False)
+        self.scrollArea_4.setVisible(False)
 
         self.label_4.setVisible(False)
         self.label_5.setVisible(False)
@@ -71,6 +72,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.tableWidget.setVisible(False)
         header = ["Test Name"]
         self.tableWidget.setHorizontalHeaderLabels(header)
+        self.tableWidget.cellClicked.connect(self.cell_was_clicked)
         self.pushButton_3.clicked.connect(self.check)
         self.show()
 
@@ -95,98 +97,97 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         for i in range(len(self.test)):
             self.tableWidget.insertRow(i)
             self.tableWidget.setItem(i, 0, QtGui.QTableWidgetItem(self.test[i]["name"].strip()))
-            self.tableWidget.item(i, 0).setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-            if i % 2 == 0:
-                self.tableWidget.item(i, 0).setBackground(QtGui.QColor("#ea4c88"))
-        self.tableWidget.cellClicked.connect(self.cell_was_clicked)
+
         self.pushButton_2.setText("Ready")
 
     def cell_was_clicked(self, row, column):
-        item = self.tableWidget.itemAt(row, column)
-        for i in range(len(self.test)):
-            if self.test[i]["name"].strip() == item.text():
-                self.selectedTest = self.test[i]["name"]
-                print(self.selectedTest)
-                self.total = self.test[i]["no"]
-                print self.total
-                break
+        print(row,column)
+        item = self.test[row]["name"].strip()
+        print(item)
+        self.selectedTest = self.test[row]["name"]
+        self.total = self.test[row]["no"]
         self.pushButton_2.clicked.connect(self.start)
 
     def start(self):
         parameters = {"setTest": self.selectedTest}
         data = urllib.urlencode(parameters)
         try:
-            req = urllib2.Request("http://"+self.IP+":8080/getData/", data)
+            req = urllib2.Request("http://localhost:8080/getData/", data)
             response = urllib2.urlopen(req, timeout=4)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
         jsonvalue = response.read()
-
+        print(jsonvalue)
         if str(jsonvalue) == "OK":
             self.pushButton_2.setText("Start")
             self.pushButton_2.clicked.connect(self.onClicked)
 
     def onClicked(self):
-        self.tableWidget.setVisible(False)
-        self.pushButton.setVisible(False)
-        self.label_8.setVisible(False)
-        self.label_3.setVisible(True)
-        self.toolButton.setVisible(True)
-        self.toolButton_2.setVisible(True)
-        self.radioButton1.setVisible(True)
-        self.radioButton2.setVisible(True)
-        self.radioButton3.setVisible(True)
-        self.radioButton4.setVisible(True)
-        self.label_4.setVisible(True)
-        self.label_5.setVisible(True)
-        self.label_6.setVisible(True)
-        self.label_7.setVisible(True)
-        self.line_2.setVisible(True)
         parameters = {"id": self.id, "testName": self.selectedTest}
         data = urllib.urlencode(parameters)
         try:
-            req = urllib2.Request("http://"+self.IP+":8080/getQuestions/", data)
+            req = urllib2.Request("http://localhost:8080/getQuestions/", data)
             response = urllib2.urlopen(req, timeout=4)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
         jsonvalue = response.read()
-        self.j = json.loads(jsonvalue)
-        self.label_2.setText("Your questions for today :  "+str(self.id) + "/"+str(self.total))
-        self.label_3.setText("\n"+self.j["id"]+".  "+self.j["question"])
-        self.Qtype = self.j["type"]
-        if self.Qtype == "text":
-            self.radioButton1.setText("A : ")
-            self.label_4.setText(self.j["option1"])
-            self.radioButton2.setText("B : ")
-            self.label_6.setText(self.j["option2"])
-            self.radioButton3.setText("C : ")
-            self.label_5.setText(self.j["option3"])
-            self.radioButton4.setText("D : ")
-            self.label_7.setText(self.j["option4"])
+        if str(jsonvalue).strip() is "NOT AVAILABLE":
+            self.label_8.setText("The test you selected is not available")
         else:
-            self.label_4.setOpenExternalLinks(True)
-            self.label_5.setOpenExternalLinks(True)
-            self.label_6.setOpenExternalLinks(True)
-            self.label_7.setOpenExternalLinks(True)
-            self.radioButton1.setText("A : ")
+            self.tableWidget.setVisible(False)
+            self.pushButton.setVisible(False)
+            self.label_8.setVisible(False)
+            self.label_3.setVisible(True)
+            self.toolButton.setVisible(True)
+            self.toolButton_2.setVisible(True)
+            self.radioButton1.setVisible(True)
+            self.radioButton2.setVisible(True)
+            self.radioButton3.setVisible(True)
+            self.radioButton4.setVisible(True)
+            self.scrollArea_2.setVisible(True)
+            self.scrollArea_4.setVisible(True)
+            self.label_4.setVisible(True)
+            self.label_5.setVisible(True)
+            self.label_6.setVisible(True)
+            self.label_7.setVisible(True)
+            self.line_2.setVisible(True)
+            self.j = json.loads(jsonvalue)
+            self.label_2.setText("Your questions for today :  " + str(self.id) + "/" + str(self.total))
+            self.label_3.setText("\n" + self.j["id"] + ".  " + self.j["question"])
+            self.Qtype = self.j["type"]
+            if self.Qtype == "text":
+                self.radioButton1.setText("A : ")
+                self.label_4.setText(self.j["option1"])
+                self.radioButton2.setText("B : ")
+                self.label_6.setText(self.j["option2"])
+                self.radioButton3.setText("C : ")
+                self.label_5.setText(self.j["option3"])
+                self.radioButton4.setText("D : ")
+                self.label_7.setText(self.j["option4"])
+            else:
+                self.label_4.setOpenExternalLinks(True)
+                self.label_5.setOpenExternalLinks(True)
+                self.label_6.setOpenExternalLinks(True)
+                self.label_7.setOpenExternalLinks(True)
+                self.radioButton1.setText("A : ")
 
-            self.label_4.setText("Option 1")
-            self.label_4.mousePressEvent = self.repeat
-            self.radioButton2.setText("B : ")
-            self.label_6.setText("Option 2")
-            self.label_6.mousePressEvent = self.repeat2
-            self.radioButton3.setText("C : ")
+                self.label_4.setText("Option 1")
+                self.label_4.mousePressEvent = self.repeat
+                self.radioButton2.setText("B : ")
+                self.label_6.setText("Option 2")
+                self.label_6.mousePressEvent = self.repeat2
+                self.radioButton3.setText("C : ")
 
-            self.label_5.setText("Option 3")
-            self.label_5.mousePressEvent = self.repeat3
-            self.radioButton4.setText("D : ")
+                self.label_5.setText("Option 3")
+                self.label_5.mousePressEvent = self.repeat3
+                self.radioButton4.setText("D : ")
 
-            self.label_7.setText("Option 4")
-            self.label_7.mousePressEvent = self.repeat4
+                self.label_7.setText("Option 4")
+                self.label_7.mousePressEvent = self.repeat4
 
-        self.toolButton_2.clicked.connect(self.move)
-        self.toolButton.clicked.connect(self.back)
-        self.pushButton_3.setVisible(True)
+            self.toolButton_2.clicked.connect(self.move)
+            self.toolButton.clicked.connect(self.back)
+            self.pushButton_3.setVisible(True)
 
     def move(self):
         if self.id <= self.total:
@@ -212,7 +213,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             data = urllib.urlencode(parameters)
             self.label_2.setText("Your questions for today :   " + str(self.id) + "/" + str(self.total))
             try:
-                req = urllib2.Request("http://"+self.IP+":8080/getQuestions/", data)
+                req = urllib2.Request("http://localhost:8080/getQuestions/", data)
                 response = urllib2.urlopen(req, timeout=4)
             except urllib2.URLError, e:
                 raise Exception("There was an error: %r" % e)
@@ -274,7 +275,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             data = urllib.urlencode(parameters)
             self.label_2.setText("Your questions for today :   " + str(self.id) + "/" + str(self.total))
             try:
-                req = urllib2.Request("http://"+self.IP+":8080/getQuestions/", data)
+                req = urllib2.Request("http://localhost:8080/getQuestions/", data)
                 response = urllib2.urlopen(req, timeout=4)
             except urllib2.URLError, e:
                 raise Exception("There was an error: %r" % e)
@@ -348,7 +349,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
 
         data = urllib.urlencode(parameters2)
         try:
-            req = urllib2.Request("http://"+self.IP+":8080/saveResponse/", data)
+            req = urllib2.Request("http://localhost:8080/saveResponse/", data)
             response = urllib2.urlopen(req, timeout=4)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
@@ -407,7 +408,7 @@ class MyPopup(QtGui.QWidget):
 
         def __init__(self, url):
             QtGui.QWidget.__init__(self)
-            self.data = urllib2.urlopen("http://"+self.IP+":8080"+url).read()
+            self.data = urllib2.urlopen("http://localhost:8080"+url).read()
 
         def disp(self):
             pixmap = QtGui.QPixmap()
@@ -444,7 +445,7 @@ class MyPopup1(QtGui.QWidget):
 
         def disp1(self):
                 label = QtGui.QLabel(self)
-                label.setMaximumSize(600, 250)
+                label.setMaximumSize(650, 250)
                 label.setStyleSheet('color:#ea4c88;font-size:14px;font-family:Lato; padding-left:5px')
                 label.setText(
                     "\t\t\t\t\t\t<b><br><br>Instructions:</b><br><br>1. You can answer all the questions any number of times until you click submit button <br>or the test time expires.<br><br>\n\t2. You can change your option at any point of time.<br><br>\n\t3. Once you click the submit button you will not be allowed to change your options.<br><br>\n\n\t Do well. <b>ALL THE BEST!!!</b>")
@@ -453,7 +454,7 @@ class MyPopup1(QtGui.QWidget):
             self.setWindowTitle("Instructions")
             print "Opening a new popup window..."
             self.disp1()
-            self.setGeometry(QtCore.QRect(100, 100, 600, 250))
+            self.setGeometry(QtCore.QRect(100, 100, 670, 250))
             self.center()
             self.show()
 

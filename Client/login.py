@@ -3,7 +3,6 @@ import display
 import urllib2
 import urllib
 
-
 from PyQt4 import QtGui, uic
 
 qtCreatorFile = "Login.ui"
