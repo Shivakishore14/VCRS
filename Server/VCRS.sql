@@ -264,7 +264,8 @@ DROP TABLE IF EXISTS `staff`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `staff` (
   `username` text,
-  `password` text
+  `password` text,
+  `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -274,7 +275,7 @@ CREATE TABLE `staff` (
 
 LOCK TABLES `staff` WRITE;
 /*!40000 ALTER TABLE `staff` DISABLE KEYS */;
-INSERT INTO `staff` VALUES ('kishore','kishore'),('sk','new user');
+INSERT INTO `staff` VALUES ('kishore','kishore','NAME2'),('sk','new user','NAME2');
 /*!40000 ALTER TABLE `staff` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -337,4 +338,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-23 23:04:52
+-- Dump completed on 2017-02-23 23:19:57
