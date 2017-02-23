@@ -120,6 +120,8 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         print(jsonvalue)
         if str(jsonvalue) == "OK":
             self.pushButton_2.setText("Start")
+            self.pushButton_2.clicked.disconnect(self.start)
+
             self.pushButton_2.clicked.connect(self.onClicked)
 
     def onClicked(self):
@@ -373,11 +375,12 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.pushButton_2.setText("Log out")
             self.label_3.setText("\n \n"+"Thank You. You have completed your test successfully.")
             self.label_8.setText("Take next test")
+            self.pushButton_2.clicked.disconnect(self.onClicked)
             self.pushButton_2.clicked.connect(self.logout)
 
     def logout(self):
         self.pushButton_2.disconnect()
-        self.pushButton_3.disconnect()
+        self.pushButton_3.disconnect(self.check)
         self.call = login.Login()
         self.call.show()
         self.close()
