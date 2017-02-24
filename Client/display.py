@@ -45,7 +45,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.line_2.setStyleSheet('background-color:#111111')
         self.line_2.setVisible(False)
         self.label_6.setStyleSheet('color:#111111')
-        self.label_3.setStyleSheet('color:#111111')
+        self.label3.setStyleSheet('color:#111111')
         self.pushButton.setStyleSheet(
             'background-color: #1e7b1e;width:50px;height:50px;line-height:50px;color:#ffffff')
         self.pushButton_2.setStyleSheet(
@@ -62,11 +62,13 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.pushButton_2.setVisible(False)
         self.scrollArea_2.setVisible(False)
         self.scrollArea_4.setVisible(False)
+        self.scrollArea.setVisible(False)
 
         self.label_4.setVisible(False)
         self.label_5.setVisible(False)
         self.label_6.setVisible(False)
-        self.label_3.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
+
+        self.label3.setVisible(False)
         self.label_7.setVisible(False)
         self.pushButton.clicked.connect(self.showTests)
         self.tableWidget.setVisible(False)
@@ -90,7 +92,6 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.test = json.loads(jsonvalue)
         self.total = 0
         self.pushButton.setVisible(False)
-        self.label_3.setVisible(False)
         self.pushButton_2.setVisible(True)
         self.tableWidget.setVisible(True)
         self.label_2.setText("The tests you have today : ")
@@ -126,6 +127,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
 
     def onClicked(self):
         parameters = {"id": self.id, "testName": self.selectedTest}
+        print(self.selectedTest)
         data = urllib.urlencode(parameters)
         try:
             req = urllib2.Request("http://localhost:8080/getQuestions/", data)
@@ -133,13 +135,14 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
         jsonvalue = response.read()
-        if str(jsonvalue).strip() is "NOT AVAILABLE":
+        print(str(jsonvalue).strip() )
+        if str(jsonvalue).strip()[0] is "N":
             self.label_8.setText("The test you selected is not available")
         else:
             self.tableWidget.setVisible(False)
             self.pushButton.setVisible(False)
             self.label_8.setVisible(False)
-            self.label_3.setVisible(True)
+            self.label3.setVisible(True)
             self.toolButton.setVisible(True)
             self.toolButton_2.setVisible(True)
             self.radioButton1.setVisible(True)
@@ -148,14 +151,16 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.radioButton4.setVisible(True)
             self.scrollArea_2.setVisible(True)
             self.scrollArea_4.setVisible(True)
+            self.scrollArea.setVisible(True)
             self.label_4.setVisible(True)
             self.label_5.setVisible(True)
             self.label_6.setVisible(True)
             self.label_7.setVisible(True)
             self.line_2.setVisible(True)
+
             self.j = json.loads(jsonvalue)
             self.label_2.setText("Your questions for today :  " + str(self.id) + "/" + str(self.total))
-            self.label_3.setText("\n" + self.j["id"] + ".  " + self.j["question"])
+            self.label3.setText( self.j["id"] + ".  " + self.j["question"])
             self.Qtype = self.j["type"]
             if self.Qtype == "text":
                 self.radioButton1.setText("A : ")
@@ -192,8 +197,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.pushButton_3.setVisible(True)
 
     def move(self):
-        if self.id <= self.total:
-
+        if self.id  <  int(self.total.strip()):
             if self.radioButton1.isChecked():
                 self.answers[self.id-1] = "option1"
                 self.radioButton1.setChecked(False)
@@ -209,8 +213,8 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             if self.radioButton4.isChecked():
                 self.answers[self.id - 1] = "option4"
                 self.radioButton4.setChecked(False)
+            self.id += 1
 
-            self.id = self.id + 1
             parameters = {"id": self.id, "testName": self.selectedTest}
             data = urllib.urlencode(parameters)
             self.label_2.setText("Your questions for today :   " + str(self.id) + "/" + str(self.total))
@@ -221,8 +225,9 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
                 raise Exception("There was an error: %r" % e)
             jsonvalue = response.read()
             self.j = json.loads(jsonvalue)
-            self.label_3.setText("\n"+self.j["id"]+".  "+self.j["question"])
+            self.label3.setText(self.j["id"]+".  "+self.j["question"])
             self.Qtype = self.j["type"]
+
             if self.Qtype == "text":
                 self.radioButton1.setText("A : ")
                 self.label_4.setText(self.j["option1"])
@@ -284,7 +289,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
 
             jsonvalue = response.read()
             self.j = json.loads(jsonvalue)
-            self.label_3.setText("\n"+self.j["id"]+".  "+self.j["question"])
+            self.label3.setText(self.j["id"]+".  "+self.j["question"])
             self.Qtype = self.j["type"]
             if self.Qtype == "text":
                 self.radioButton1.setText("A : ")
@@ -316,6 +321,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
                 self.label_7.setText("Option 4")
                 self.label_7.mousePressEvent = self.repeat4
             self.pushButton_2.setText("Submit")
+
 
     def check(self):
         confirm = QtGui.QMessageBox.question(self, 'Confirm Submission', "Are you Sure you want to Submit?", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Cancel)
@@ -363,7 +369,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.radioButton3.setVisible(False)
             self.radioButton4.setVisible(False)
             self.pushButton_2.setVisible(True)
-            self.label_3.setVisible(True)
+            self.label3.setVisible(True)
             self.label_2.setVisible(False)
             self.label_4.setVisible(False)
             self.label_5.setVisible(False)
@@ -373,7 +379,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.toolButton_2.setVisible(False)
             self.pushButton_3.setVisible(False)
             self.pushButton_2.setText("Log out")
-            self.label_3.setText("\n \n"+"Thank You. You have completed your test successfully.")
+            self.label3.setText("\n \n"+"Thank You. You have completed your test successfully.")
             self.label_8.setText("Take next test")
             self.pushButton_2.clicked.disconnect(self.onClicked)
             self.pushButton_2.clicked.connect(self.logout)
