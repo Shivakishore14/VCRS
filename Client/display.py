@@ -53,7 +53,6 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.pushButton_3.setVisible(False)
         self.pushButton_3.setStyleSheet(
             'background-color: #1e7b1e;width:50px;height:50px;line-height:50px;color:#ffffff')
-
         self.toolButton_2.setStyleSheet('background-color:DeepSkyBlue')
         self.radioButton1.setVisible(False)
         self.radioButton2.setVisible(False)
