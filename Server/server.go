@@ -15,8 +15,8 @@ import (
 )
 
 var database = "VCRS"
-var user = "root"
-var password = "Gsurtham1@"
+var user = "test"
+var password = "test"
 
 type question struct {
 	Id      string `json:"id"`
@@ -68,15 +68,15 @@ func isLoginValid(username string, pass string, table string) (string, bool) {
 		log.Print(err)
 		return "", false
 	}
-	var name string
+	var name ,username1 string
 	defer db.Close()
-	row := db.QueryRow("SELECT username FROM "+table+" WHERE password=? AND username=?", pass, username)
-	e := row.Scan(&name)
+	row := db.QueryRow("SELECT name,username FROM "+table+" WHERE password=? AND username=?", pass, username)
+	e := row.Scan(&name,&username1)
 	if e != nil {
 		log.Println(e)
 		return "INVALID", false
 	}
-	if name == username {
+	if username1 == username {
 		return name, true
 	}
 	return "INVALID", false
