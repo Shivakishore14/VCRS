@@ -25,14 +25,14 @@
     </property>
     <property name="font">
      <font>
-      <family>Lato</family>
+      <family>URW Gothic L</family>
       <pointsize>18</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
-     <string>Velammal Classroom Reponse System(CRS)</string>
+     <string>Velammal Classroom Reponse System</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -85,6 +85,7 @@
      </property>
      <property name="font">
       <font>
+       <family>URW Gothic L</family>
        <pointsize>14</pointsize>
        <weight>75</weight>
        <bold>true</bold>
@@ -108,7 +109,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Lato</family>
+       <family>FreeSans</family>
        <pointsize>11</pointsize>
        <weight>75</weight>
        <bold>true</bold>
@@ -132,7 +133,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Lato</family>
+       <family>FreeSans</family>
        <pointsize>11</pointsize>
        <weight>75</weight>
        <bold>true</bold>
@@ -153,7 +154,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Lato</family>
+       <family>URW Gothic L</family>
        <pointsize>12</pointsize>
        <weight>75</weight>
        <italic>false</italic>
@@ -162,6 +163,9 @@
      </property>
      <property name="text">
       <string>Login</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -232,6 +236,7 @@
     </property>
     <property name="font">
      <font>
+      <family>FreeSans</family>
       <pointsize>10</pointsize>
       <weight>75</weight>
       <bold>true</bold>

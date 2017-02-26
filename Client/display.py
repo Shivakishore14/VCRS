@@ -29,10 +29,16 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.ID = str(ID)
         self.IP = IP
 
+        self.answer = QtGui.QButtonGroup(self)
+        self.answer.addButton(self.radioButton1)
+        self.answer.addButton(self.radioButton2)
+        self.answer.addButton(self.radioButton3)
+        self.answer.addButton(self.radioButton4)
+        self.answer.setExclusive(True)
         self.label.setText("Hi " + name)
         self.toolButton.setVisible(False)
         self.toolButton_2.setVisible(False)
-        self.toolButton.setStyleSheet('background-color:DeepSkyBlue')
+
      
 
         self.label.setStyleSheet('color:#111111')
@@ -46,14 +52,13 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.line_2.setVisible(False)
         self.label_6.setStyleSheet('color:#111111')
         self.label3.setStyleSheet('color:#111111')
-        self.pushButton.setStyleSheet(
-            'background-color: #1e7b1e;width:50px;height:50px;line-height:50px;color:#ffffff')
-        self.pushButton_2.setStyleSheet(
-            'background-color: #1e7b1e;width:50px;height:50px;line-height:50px;color:#ffffff')
         self.pushButton_3.setVisible(False)
+        self.pushButton.setStyleSheet(
+            'border-radius:2px;background-color: #ffffff;width: 100%;padding: 10px;color: #111111; border: 1px solid black')
         self.pushButton_3.setStyleSheet(
-            'background-color: #1e7b1e;width:50px;height:50px;line-height:50px;color:#ffffff')
-        self.toolButton_2.setStyleSheet('background-color:DeepSkyBlue')
+            'border-radius:2px;background-color: #ffffff;width: 100%;padding: 10px;color: #111111; border: 1px solid black')
+        self.pushButton_2.setStyleSheet(
+            'border-radius:2px;background-color: #ffffff;width: 100%;padding: 10px;color: #111111;border: 1px solid black')
         self.radioButton1.setVisible(False)
         self.radioButton2.setVisible(False)
         self.radioButton3.setVisible(False)
@@ -96,14 +101,12 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.label_2.setText("The tests you have today : ")
         for i in range(len(self.test)):
             self.tableWidget.insertRow(i)
-            self.tableWidget.setItem(i, 0, QtGui.QTableWidgetItem(self.test[i]["name"].strip()))
+            self.tableWidget.setItem(i, 0, QtGui.QTableWidgetItem("          " +self.test[i]["name"].strip()))
 
         self.pushButton_2.setText("Ready")
 
     def cell_was_clicked(self, row, column):
-        print(row,column)
         item = self.test[row]["name"].strip()
-        print(item)
         self.selectedTest = self.test[row]["name"]
         self.total = self.test[row]["no"]
         self.pushButton_2.clicked.connect(self.start)
@@ -197,6 +200,9 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
 
     def move(self):
         if self.id  <  int(self.total.strip()):
+
+
+            self.answer.setExclusive(False)
             if self.radioButton1.isChecked():
                 self.answers[self.id-1] = "option1"
                 self.radioButton1.setChecked(False)
@@ -212,6 +218,22 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             if self.radioButton4.isChecked():
                 self.answers[self.id - 1] = "option4"
                 self.radioButton4.setChecked(False)
+            self.answer.setExclusive(True)
+            '''try :
+                if self.answers[self.id]:
+                    if self.radioButton1.isChecked() and self.radioButton2.isChecked() and self.radioButton3.isChecked() and self.radioButton4.isChecked():
+                        pass
+                    else:
+                        if self.answers[self.id ] is "option2":
+                            self.radioButton2.setChecked(True)
+                        if self.answers[self.id ] is "option1":
+                            self.radioButton1.setChecked(True)
+                        if self.answers[self.id ] is "option3":
+                            self.radioButton3.setChecked(True)
+                        if self.answers[self.id ] is "option4":
+                            self.radioButton4.setChecked(True)
+            finally:'''
+
             self.id += 1
 
             parameters = {"id": self.id, "testName": self.selectedTest}
@@ -260,9 +282,11 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
     def back(self):
         if self.id >= 2:
 
+            self.answer.setExclusive(False)
             if self.radioButton1.isChecked():
                 self.answers[self.id - 1] = "option1"
                 self.radioButton1.setChecked(False)
+
 
             if self.radioButton2.isChecked():
                 self.answers[self.id - 1] = "option2"
@@ -275,7 +299,21 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             if self.radioButton4.isChecked():
                 self.answers[self.id - 1] = "option4"
                 self.radioButton4.setChecked(False)
-
+            self.answer.setExclusive(True)
+            '''try:
+                if self.answers[self.id]:
+                    if self.radioButton1.isChecked() and self.radioButton2.isChecked() and self.radioButton3.isChecked() and self.radioButton4.isChecked():
+                        pass
+                    else:
+                        if self.answers[self.id] is "option2":
+                            self.radioButton2.setChecked(True)
+                        if self.answers[self.id] is "option1":
+                            self.radioButton1.setChecked(True)
+                        if self.answers[self.id] is "option3":
+                            self.radioButton3.setChecked(True)
+                        if self.answers[self.id] is "option4":
+                            self.radioButton4.setChecked(True)
+            finally:'''
             self.id = self.id - 1
             parameters = {"id": self.id, "testName": self.selectedTest}
             data = urllib.urlencode(parameters)
@@ -384,8 +422,8 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.pushButton_2.clicked.connect(self.logout)
 
     def logout(self):
-        self.pushButton_2.disconnect()
-        self.pushButton_3.disconnect(self.check)
+        self.pushButton_2.clicked.disconnect(self.logout)
+        self.pushButton_3.clicked.disconnect(self.check)
         self.call = login.Login()
         self.call.show()
         self.close()
@@ -433,7 +471,6 @@ class MyPopup(QtGui.QWidget):
             self.move(frameGm.topLeft())
 
         def doit(self):
-            print "Opening a new popup window..."
             self.disp()
             self.setGeometry(QtCore.QRect(100, 100, 600, 300))
             self.center()
@@ -454,13 +491,12 @@ class MyPopup1(QtGui.QWidget):
         def disp1(self):
                 label = QtGui.QLabel(self)
                 label.setMaximumSize(650, 250)
-                label.setStyleSheet('color:#ea4c88;font-size:14px;font-family:Lato; padding-left:5px')
+                label.setStyleSheet('color:#111111;font-size:14px;font-family:Lato; padding-left:5px')
                 label.setText(
                     "\t\t\t\t\t\t<b><br><br>Instructions:</b><br><br>1. You can answer all the questions any number of times until you click submit button <br>or the test time expires.<br><br>\n\t2. You can change your option at any point of time.<br><br>\n\t3. Once you click the submit button you will not be allowed to change your options.<br><br>\n\n\t Do well. <b>ALL THE BEST!!!</b>")
 
         def doit1(self):
             self.setWindowTitle("Instructions")
-            print "Opening a new popup window..."
             self.disp1()
             self.setGeometry(QtCore.QRect(100, 100, 670, 250))
             self.center()

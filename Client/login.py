@@ -25,8 +25,8 @@ class Login(QtGui.QMainWindow, Ui_MainWindow):
 
         self.setWindowTitle("Login")
         self.line.setStyleSheet('background-color:#111111')
-        self.lineEdit.setPlaceholderText("     Student ID")
-        self.lineEdit_2.setPlaceholderText("     Password")
+        self.lineEdit.setPlaceholderText("Student ID")
+        self.lineEdit_2.setPlaceholderText("Password")
         self.lineEdit_2.setEchoMode(QtGui.QLineEdit.Password)
         self.label_3.setStyleSheet('color: red')
         self.label_2.setStyleSheet('color: black')
@@ -40,10 +40,10 @@ class Login(QtGui.QMainWindow, Ui_MainWindow):
         self.label_14.setStyleSheet('background-image:url("tweet.png");')
         screen = QtGui.QDesktopWidget().screenGeometry(self)
         self.move((screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2)
-        self.lineEdit.setStyleSheet('border-radius:4px;color: black;border:1px solid black;')
-        self.lineEdit_2.setStyleSheet('border-radius:4px;color: black;border:1px solid black;')
+        self.lineEdit.setStyleSheet('border-radius:4px;color: black;border:1px solid black;padding: 10px;')
+        self.lineEdit_2.setStyleSheet('border-radius:4px;color: black;border:1px solid black;padding: 10px;')
         self.label.setStyleSheet('color:#111111')
-        self.pushButton.setStyleSheet('border-radius:3px;box-shadow: 0 2px 0 0 #1e7b1e;background-color: #1e7b1e;width: 100%;padding: 10px;color: #ffffff;')
+        self.pushButton.setStyleSheet('border-radius:2px;background-color: #ffffff;width: 100%;padding: 10px;color: #111111;border: 1px solid black')
 
         self.pushButton.clicked.connect(self.pushButton_clicked)
 
