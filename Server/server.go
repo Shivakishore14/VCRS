@@ -15,8 +15,8 @@ import (
 )
 
 var database = "VCRS"
-var user = "root"
-var password = "Gsurtham1@"
+var user = "test"
+var password = "test"
 
 type question struct {
 	Id      string `json:"id"`

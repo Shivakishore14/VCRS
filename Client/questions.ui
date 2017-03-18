@@ -507,7 +507,7 @@
     </property>
     <property name="font">
      <font>
-      <family>Lato</family>
+      <family>URW Gothic L</family>
       <pointsize>10</pointsize>
       <weight>75</weight>
       <bold>true</bold>

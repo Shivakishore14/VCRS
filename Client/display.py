@@ -20,7 +20,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
     answers = {}
     test = {}
     selectedTest = ""
-
+    answered = 0
     def __init__(self, ID, name, IP):
         QtGui.QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
@@ -219,20 +219,6 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
                 self.answers[self.id - 1] = "option4"
                 self.radioButton4.setChecked(False)
             self.answer.setExclusive(True)
-            '''try :
-                if self.answers[self.id]:
-                    if self.radioButton1.isChecked() and self.radioButton2.isChecked() and self.radioButton3.isChecked() and self.radioButton4.isChecked():
-                        pass
-                    else:
-                        if self.answers[self.id ] is "option2":
-                            self.radioButton2.setChecked(True)
-                        if self.answers[self.id ] is "option1":
-                            self.radioButton1.setChecked(True)
-                        if self.answers[self.id ] is "option3":
-                            self.radioButton3.setChecked(True)
-                        if self.answers[self.id ] is "option4":
-                            self.radioButton4.setChecked(True)
-            finally:'''
 
             self.id += 1
 
@@ -248,6 +234,20 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.j = json.loads(jsonvalue)
             self.label3.setText(self.j["id"]+".  "+self.j["question"])
             self.Qtype = self.j["type"]
+            self.answer.setExclusive(False)
+            print(self.answers)
+            print(self.id)
+            if self.available(self.id-1):
+                option = self.answers[self.id-1]
+                if option is "option1":
+                    self.radioButton1.setChecked(True)
+                if option is "option2":
+                    self.radioButton2.setChecked(True)
+                if option is "option3":
+                    self.radioButton3.setChecked(True)
+                if option is "option4":
+                    self.radioButton4.setChecked(True)
+            self.answer.setExclusive(True)
 
             if self.Qtype == "text":
                 self.radioButton1.setText("A : ")
@@ -279,17 +279,23 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
                 self.label_7.setText("Option 4")
                 self.label_7.mousePressEvent = self.repeat4
 
+    def available(self, val):
+        if val in self.answers:
+            return True
+        else :
+            return False
+
     def back(self):
         if self.id >= 2:
 
             self.answer.setExclusive(False)
             if self.radioButton1.isChecked():
-                self.answers[self.id - 1] = "option1"
+                self.answers[self.id -1] = "option1"
                 self.radioButton1.setChecked(False)
 
 
             if self.radioButton2.isChecked():
-                self.answers[self.id - 1] = "option2"
+                self.answers[self.id -1] = "option2"
                 self.radioButton2.setChecked(False)
 
             if self.radioButton3.isChecked():
@@ -300,20 +306,9 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
                 self.answers[self.id - 1] = "option4"
                 self.radioButton4.setChecked(False)
             self.answer.setExclusive(True)
-            '''try:
-                if self.answers[self.id]:
-                    if self.radioButton1.isChecked() and self.radioButton2.isChecked() and self.radioButton3.isChecked() and self.radioButton4.isChecked():
-                        pass
-                    else:
-                        if self.answers[self.id] is "option2":
-                            self.radioButton2.setChecked(True)
-                        if self.answers[self.id] is "option1":
-                            self.radioButton1.setChecked(True)
-                        if self.answers[self.id] is "option3":
-                            self.radioButton3.setChecked(True)
-                        if self.answers[self.id] is "option4":
-                            self.radioButton4.setChecked(True)
-            finally:'''
+
+
+
             self.id = self.id - 1
             parameters = {"id": self.id, "testName": self.selectedTest}
             data = urllib.urlencode(parameters)
@@ -327,6 +322,21 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             jsonvalue = response.read()
             self.j = json.loads(jsonvalue)
             self.label3.setText(self.j["id"]+".  "+self.j["question"])
+            print(self.answers)
+            print(self.id)
+            self.answer.setExclusive(False)
+            if self.available(self.id-1):
+                option = self.answers[self.id-1]
+                print(option)
+                if option is "option1":
+                    self.radioButton1.setChecked(True)
+                if option is "option2":
+                    self.radioButton2.setChecked(True)
+                if option is "option3":
+                    self.radioButton3.setChecked(True)
+                if option is "option4":
+                    self.radioButton4.setChecked(True)
+            self.answer.setExclusive(True)
             self.Qtype = self.j["type"]
             if self.Qtype == "text":
                 self.radioButton1.setText("A : ")
