@@ -68,10 +68,10 @@ func isLoginValid(username string, pass string, table string) (string, bool) {
 		log.Print(err)
 		return "", false
 	}
-	var name ,username1 string
+	var name, username1 string
 	defer db.Close()
 	row := db.QueryRow("SELECT name,username FROM "+table+" WHERE password=? AND username=?", pass, username)
-	e := row.Scan(&name,&username1)
+	e := row.Scan(&name, &username1)
 	if e != nil {
 		log.Println(e)
 		return "INVALID", false
@@ -351,6 +351,7 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("test1")
+	score := 0
 	for i, v := range obj.Ans {
 		fmt.Println("test2")
 		query = "select sid from " + tableName + " where sid = ? and qno = ? LIMIT 1"
@@ -377,8 +378,19 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 		if e != nil {
 			fmt.Fprint(w, "not OK", i)
 		}
+		query = "select ans from " + obj.TestName + " where id = ?"
+		var answer string
+		row := db.QueryRow(query, i+1)
+		e = row.Scan(&answer)
+		if e != nil {
+			if answer == v {
+				score++
+			}
+		}
+
 	}
-	fmt.Fprintf(w, "OK")
+	fmt.Println("Score == > ", string(score))
+	fmt.Fprintf(w, string(score))
 }
 func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
@@ -593,7 +605,7 @@ func fetchTest(c int) string {
 	if errs != nil {
 		log.Print(err)
 	}
-	if rows ==nil {
+	if rows == nil {
 		return "not available"
 	}
 	defer rows.Close()
@@ -669,5 +681,6 @@ func main() {
 	http.HandleFunc("/changeData/", changeDataHandler)
 	http.HandleFunc("/register/", registerHandler)
 	http.HandleFunc("/changeLogin/", changeLoginHandler)
+	fmt.Print("Started Server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
