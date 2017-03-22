@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<div id="top">
-			<span id="logo">V.C.R.S</span>
+			<span id="logo">Velammal Classroom Response System</span>
 			<div class="dropdown pull-right" id="settings">
             <span data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span><b class="caret"></b></span>
             <ul class="dropdown-menu">
@@ -196,8 +196,9 @@
 		}
 		#top{
 			height:50px;
+			padding-top: 5px;
 			background-color:#00AE6D;
-			padding-left:5%;
+			padding-left:3%;
 			color: #fff;
 			font-size: 30px;
 			font-weight: bold;
@@ -326,7 +327,11 @@
 		}
 		#settings{
 			margin-right: 30px;
-			margin-top: 20px;
+			margin-top: 10px;
+			cursor:pointer;
+		}
+		#logo{
+			margin-top: 10px;
 		}
 	</style>
 	<script>
@@ -442,6 +447,7 @@
 				$("#overlay").hide();
 
 				$(".form-control").prop('disabled', true);
+				$("#settings").hide();
 			}
 		});
 		function checkTest(name ){

@@ -66,3 +66,4 @@ func main() {
 	http.HandleFunc("/adminLogin/", adminLoginHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
+`

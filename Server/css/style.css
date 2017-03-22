@@ -2,7 +2,7 @@
 
 .login-page {
   width: 360px;
-  padding: 8% 0 0;
+  padding: 3% 0 0;
   margin: auto;
 }
 .form {
@@ -96,5 +96,5 @@ body {
   background: linear-gradient(to left, #00AE6D, #00AE6D);
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;      
+  -moz-osx-font-smoothing: grayscale;
 }
