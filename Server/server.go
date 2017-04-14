@@ -382,15 +382,18 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 		var answer string
 		row := db.QueryRow(query, i+1)
 		e = row.Scan(&answer)
-		if e != nil {
+		fmt.Println(v, "--", answer)
+		if e == nil {
+			fmt.Println("--")
 			if answer == v {
+				fmt.Println("++")
 				score++
 			}
 		}
 
 	}
-	fmt.Println("Score == > ", string(score))
-	fmt.Fprintf(w, string(score))
+	fmt.Println("Score == > ", score)
+	fmt.Fprintf(w, strconv.Itoa(score))
 }
 func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")

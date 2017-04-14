@@ -66,7 +66,7 @@ CREATE TABLE `MutiDimentionalArraysresponse` (
 
 LOCK TABLES `MutiDimentionalArraysresponse` WRITE;
 /*!40000 ALTER TABLE `MutiDimentionalArraysresponse` DISABLE KEYS */;
-INSERT INTO `MutiDimentionalArraysresponse` VALUES ('CRS-1234',1,'option1'),('CRS-1234',2,'option2'),('CRS-1234',3,'option3'),('CRS-1234',4,'option3'),('CRS-1234',5,'option2'),('CRS-1234',6,'option2'),('CRS-1234',7,'option3'),('CRS-1234',8,'option2'),('CRS-1234',9,'option1'),('CRS-1234',10,'option2');
+INSERT INTO `MutiDimentionalArraysresponse` VALUES ('CRS-1234',1,'option1'),('CRS-1234',2,'option1'),('CRS-1234',3,'option2'),('CRS-1234',4,'option1'),('CRS-1234',5,'option4'),('CRS-1234',6,'option4'),('CRS-1234',7,'option4'),('CRS-1234',8,'option3'),('CRS-1234',9,'option2'),('CRS-1234',10,'option1');
 /*!40000 ALTER TABLE `MutiDimentionalArraysresponse` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,6 +144,29 @@ CREATE TABLE `newTest2response` (
 LOCK TABLES `newTest2response` WRITE;
 /*!40000 ALTER TABLE `newTest2response` DISABLE KEYS */;
 /*!40000 ALTER TABLE `newTest2response` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `response`
+--
+
+DROP TABLE IF EXISTS `response`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `response` (
+  `sid` varchar(10) DEFAULT NULL,
+  `qno` int(11) DEFAULT NULL,
+  `ans` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `response`
+--
+
+LOCK TABLES `response` WRITE;
+/*!40000 ALTER TABLE `response` DISABLE KEYS */;
+/*!40000 ALTER TABLE `response` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -325,7 +348,7 @@ CREATE TABLE `testDetails` (
 
 LOCK TABLES `testDetails` WRITE;
 /*!40000 ALTER TABLE `testDetails` DISABLE KEYS */;
-INSERT INTO `testDetails` VALUES ('MutiDimentionalArrays','10','ONLINE','3'),('newTest2','10','','2'),('sampleTest1','4','OFFLINE','4'),('sk','10','ONLINE','3');
+INSERT INTO `testDetails` VALUES ('MutiDimentionalArrays','10','ONLINE','3'),('newTest2','10','ONLINE','2'),('sampleTest1','4','OFFLINE','4'),('sk','10','ONLINE','3');
 /*!40000 ALTER TABLE `testDetails` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -338,4 +361,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-23 23:19:57
+-- Dump completed on 2017-03-22 12:20:08
