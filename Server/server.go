@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -17,9 +18,10 @@ import (
 var database = "VCRS"
 var user = "test"
 var password = "test"
+var db *sql.DB
 
 type question struct {
-	Id      string `json:"id"`
+	ID      string `json:"id"`
 	Class   string `json:"class"`
 	Ques    string `json:"question"`
 	Option1 string `json:"option1"`
@@ -45,6 +47,14 @@ type stuList struct {
 	Password string `json:"password"`
 	Name     string `json:"name"`
 }
+type level struct {
+	Number int `json:"number"`
+	Val    int `json:"val"`
+}
+type levelSetModel struct {
+	Levels   []level `json:"levels"`
+	TestName string  `json:"testName"`
+}
 
 /*type testListArray struct {
 	arr TestList `json:"arr"`
@@ -63,13 +73,8 @@ type staffs struct {
 }
 
 func isLoginValid(username string, pass string, table string) (string, bool) {
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-		return "", false
-	}
+
 	var name, username1 string
-	defer db.Close()
 	row := db.QueryRow("SELECT name,username FROM "+table+" WHERE password=? AND username=?", pass, username)
 	e := row.Scan(&name, &username1)
 	if e != nil {
@@ -84,13 +89,7 @@ func isLoginValid(username string, pass string, table string) (string, bool) {
 func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	pass := r.FormValue("password")
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-		return
-	}
 	var name string
-	defer db.Close()
 	row := db.QueryRow("SELECT username FROM admin WHERE password=? AND username=?", pass, username)
 	e := row.Scan(&name)
 	if e != nil {
@@ -146,12 +145,7 @@ func getQuesHandler(w http.ResponseWriter, r *http.Request) {
 	tName := r.FormValue("testName")
 	qtype := "text"
 	fmt.Println(id, "-->", tName)
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
 	var class, ques, op1, op2, op3, op4, ans, level string
-	defer db.Close()
 	q := "SELECT * FROM " + tName + " WHERE id = ?"
 	row := db.QueryRow(q, id)
 	e := row.Scan(&id, &class, &ques, &op1, &op2, &op3, &op4, &ans, &level)
@@ -163,7 +157,7 @@ func getQuesHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(string(op1), "/images/") {
 		qtype = "image"
 	}
-	qobj := &question{Id: id, Class: class, Ques: ques, Option1: op1, Option2: op2, Option3: op3, Option4: op4, Ans: ans, Type: qtype, Level: level}
+	qobj := &question{ID: id, Class: class, Ques: ques, Option1: op1, Option2: op2, Option3: op3, Option4: op4, Ans: ans, Type: qtype, Level: level}
 	qjson, je := json.Marshal(qobj)
 	if je != nil {
 		log.Print(je)
@@ -177,11 +171,6 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 	status := r.FormValue("status")
 	allTest := r.FormValue("allTest")
 	if status != "" && testName != "" {
-		db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-		if err = db.Ping(); err != nil {
-			log.Print(err)
-		}
-		defer db.Close()
 		_, e := db.Exec("update testDetails set status = ? where testName = ?", status, testName)
 		if e != nil {
 			log.Print(e)
@@ -190,11 +179,11 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 	if getTest == "" && testName != "" && allTest == "" {
 
 		//deleted code
-		resJson, erj := json.Marshal(getAns(testName))
+		resJSON, erj := json.Marshal(getAns(testName))
 		if erj != nil {
 			log.Print(erj)
 		}
-		fmt.Fprintf(w, string(resJson))
+		fmt.Fprintf(w, string(resJSON))
 		return
 	} else if setTest == "" {
 		if allTest != "" {
@@ -214,20 +203,22 @@ func createNewTestHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Check number fields")
 		return
 	}
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
+	levelList := make([]level, 0, 100)
+	levels, _ := strconv.Atoi(l)
+	for i := 1; i <= levels; i++ {
+		temp := level{i, 0}
+		levelList = append(levelList, temp)
 	}
-	defer db.Close()
+	jdata, _ := json.Marshal(levelList)
 
 	// TODO: check test already present
 
-	_, e := db.Exec("insert into testDetails values( ? , ? , '', ? )", testName, no, l)
+	_, e := db.Exec("insert into testDetails values( ? , ? , '', ?, ? )", testName, no, l, string(jdata))
 	// code to create the table for the test
 	q := "CREATE TABLE " + testName + " ( id int NOT NULL AUTO_INCREMENT, class text, ques text, option1 text, option2 text, option3 text, option4 text,ans text, level text, PRIMARY KEY (id)) "
-	_, e1 := db.Exec(q)
+	db.Exec(q)
 	query := "CREATE TABLE IF NOT EXISTS " + testName + "response ( sid varchar(10), qno int, ans varchar(30))"
-	_, e1 = db.Exec(query)
+	_, e1 := db.Exec(query)
 	if e != nil || e1 != nil {
 		fmt.Fprintf(w, "not OK")
 	} else {
@@ -289,14 +280,9 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("work akuthu " + ans)
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
 	fmt.Print(testName, "----> ", id)
-	rowId := db.QueryRow("SELECT id from "+testName+" WHERE id = ?", id)
-	eid := rowId.Scan(&id)
+	rowID := db.QueryRow("SELECT id from "+testName+" WHERE id = ?", id)
+	eid := rowID.Scan(&id)
 	if eid != nil {
 		if eid == sql.ErrNoRows {
 			query := "insert into " + testName + "(class, ques, option1, option2, option3, option4, ans, level) values( '' , ?, ? , ? , ? ,? , ?, ? )"
@@ -321,10 +307,10 @@ func saveToTestHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var nextId int
+	var nextID int
 	row := db.QueryRow("SELECT id from " + testName + " ORDER BY id desc LIMIT 1 ")
-	er := row.Scan(&nextId)
-	S := (strconv.Itoa(nextId + 1))
+	er := row.Scan(&nextID)
+	S := (strconv.Itoa(nextID + 1))
 	if er != nil {
 		fmt.Fprintf(w, " Not done Error occured")
 	}
@@ -340,11 +326,6 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	tableName := obj.TestName + "response"
 	query := "CREATE TABLE IF NOT EXISTS " + tableName + "( sid varchar(10), qno int, ans varchar(30))"
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
 	_, e := db.Exec(query)
 	if e != nil {
 		fmt.Println("not OK")
@@ -355,9 +336,9 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 	for i, v := range obj.Ans {
 		fmt.Println("test2")
 		query = "select sid from " + tableName + " where sid = ? and qno = ? LIMIT 1"
-		rowId := db.QueryRow(query, obj.Sid, i+1) //check if present
+		rowID := db.QueryRow(query, obj.Sid, i+1) //check if present
 		var temp string
-		e = rowId.Scan(&temp)
+		e = rowID.Scan(&temp)
 
 		if e != nil {
 			fmt.Println("goes to err block", e)
@@ -398,11 +379,6 @@ func saveResponseHandler(w http.ResponseWriter, r *http.Request) {
 func showResultHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
 	trname := tname + "response"
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err, tname)
-	}
-	defer db.Close()
 	stud := make([]string, 0, 100)
 	resL := make([]response, 0, 100)
 	//ans := getAns(tname);
@@ -438,22 +414,17 @@ func showResultHandler(w http.ResponseWriter, r *http.Request) {
 		obj := response{TestName: tname, Sid: tstud, Ans: ans}
 		resL = append(resL, obj)
 	}
-	resJson, erj := json.Marshal(resL)
+	resJSON, erj := json.Marshal(resL)
 	if erj != nil {
 		log.Print(erj)
 	}
-	fmt.Fprintf(w, string(resJson))
+	fmt.Fprintf(w, string(resJSON))
 
 }
 func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 	tname := r.FormValue("testName")
 	otype := r.FormValue("type")
 	fmt.Print(otype, " called")
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
 	if string(otype) == "rename" {
 		newTestName := r.FormValue("newTestName")
 		if strings.ContainsAny(newTestName, " ") {
@@ -503,11 +474,6 @@ func changeDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	jsonData := r.FormValue("list")
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
 
 	var list *[]stuList
 	added := make([]string, 0, 100)
@@ -533,11 +499,7 @@ func changeLoginHandler(w http.ResponseWriter, r *http.Request) {
 	newUsername := r.FormValue("newUsername")
 	oldPassword := r.FormValue("oldPassword")
 	newPassword := r.FormValue("newPassword")
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
+
 	msg := "try again"
 	sqlCheckPass := "SELECT password from staff where username = ?"
 	row := db.QueryRow(sqlCheckPass, username)
@@ -546,7 +508,7 @@ func changeLoginHandler(w http.ResponseWriter, r *http.Request) {
 	e := row.Scan(&tempPass)
 	if e == nil {
 		if tempPass == oldPassword {
-			sqlUpdate := ""
+			var sqlUpdate string
 			if newUsername == "" {
 				sqlUpdate = "UPDATE staff set password = ? where username = ?"
 				fmt.Println("changing password")
@@ -563,13 +525,52 @@ func changeLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, msg)
 }
+func levelHandler(w http.ResponseWriter, r *http.Request) {
+	//	fmt.Println(r.Body)
+	if r.FormValue("testName") != "" {
+		testName := r.FormValue("testName")
+		row := db.QueryRow("select levelJson from testDetails where testName = ?", testName)
+		var jsonData string
+		e := row.Scan(&jsonData)
+		if e != nil {
+			log.Println(e)
+			return
+		}
+		//fmt.Println(jsonData)
+		fmt.Fprint(w, jsonData)
+	} else {
 
-func getAns(testName string) []ansLevel {
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
+		var t levelSetModel
+		var bodyBytes []byte
+		bodyBytes, _ = ioutil.ReadAll(r.Body)
+		bodyString := string(bodyBytes)
+		fmt.Println(bodyString)
+
+		e1 := json.Unmarshal([]byte(bodyString), &t)
+		if e1 != nil {
+			fmt.Println(e1)
+		}
+		fmt.Println(t)
+		row := db.QueryRow("select level from testDetails where testName = ?", t.TestName)
+		var temp string
+		e := row.Scan(&temp)
+		if e != nil {
+			log.Println(e)
+			return
+		}
+		lev, _ := strconv.Atoi(temp)
+		if lev != len(t.Levels) {
+			log.Println("Error length of the levelJson and levels not equal")
+			fmt.Println(lev, len(t.Levels))
+			return
+		}
+		jdata, _ := json.Marshal(t.Levels)
+
+		db.Exec("update testDetails set levelJson = ? where testName =?", string(jdata), t.TestName)
 	}
-	defer db.Close()
+}
+func getAns(testName string) []ansLevel {
+
 	fmt.Println(testName)
 	qAns := "select ans, level from " + testName
 	rows, errs := db.Query(qAns)
@@ -591,14 +592,9 @@ func getAns(testName string) []ansLevel {
 }
 func fetchTest(c int) string {
 	//fmt.Println("a")
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
 	var name, no, level, status string
 	objArr := make([]testList, 0, 10)
-	q := ""
+	var q string
 	if c == 1 {
 		q = "select testName, noOfQues, level, status from testDetails"
 	} else {
@@ -606,7 +602,7 @@ func fetchTest(c int) string {
 	}
 	rows, errs := db.Query(q)
 	if errs != nil {
-		log.Print(err)
+		log.Print(errs)
 	}
 	if rows == nil {
 		return "not available"
@@ -631,11 +627,6 @@ func fetchTest(c int) string {
 }
 func renameTest(oldName string, newName string) {
 	//fmt.Println("a")
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
 	q1 := "RENAME TABLE " + oldName + " TO " + newName
 	q2 := "RENAME TABLE " + oldName + "response TO " + newName + "response"
 	q3 := "update testDetails set testName = '" + newName + "' where testName = '" + oldName + "'"
@@ -647,16 +638,12 @@ func renameTest(oldName string, newName string) {
 	}
 }
 func fetchTestData(testName string) string {
-	db, err := sql.Open("mysql", user+":"+password+"@/"+database)
-	if err = db.Ping(); err != nil {
-		log.Print(err)
-	}
-	defer db.Close()
+
 	var name, no string
 	result := ""
 	rows, errs := db.Query("select testName,noOfQues from testDetails where testName = ?", testName)
 	if errs != nil {
-		log.Print(err)
+		log.Print(errs)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -670,6 +657,10 @@ func fetchTestData(testName string) string {
 }
 
 func main() {
+	db, _ = sql.Open("mysql", user+":"+password+"@/"+database)
+	if err := db.Ping(); err != nil {
+		log.Print(err)
+	}
 	fs := http.FileServer(http.Dir("."))
 	http.Handle("/", fs)
 	http.HandleFunc("/adminLogin/", adminLoginHandler)
@@ -684,6 +675,7 @@ func main() {
 	http.HandleFunc("/changeData/", changeDataHandler)
 	http.HandleFunc("/register/", registerHandler)
 	http.HandleFunc("/changeLogin/", changeLoginHandler)
+	http.HandleFunc("/level/", levelHandler)
 	fmt.Print("Started Server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

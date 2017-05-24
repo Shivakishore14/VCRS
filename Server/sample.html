@@ -37,12 +37,8 @@
 					<button class="btn btn-success" id="btnChart" onclick="chartViewOn()">show Chart</button>
 
 					<div id="status" class="row">
-						<div class="col-md-6">
-							<div id="chart_div" style="width:900px; height: 900px;"></div>
-						</div>
-						<div class="col-md-6">
-							<div id="chart_div2"></div>
-						</div>
+						<div id="chart_div2"></div>
+						<div id="chart_div" style="width:900px; height: 900px;"></div>
 					</div>
 				</div>
 			</div>
@@ -94,6 +90,7 @@
 		var ansarray = new Array();
 		var levelarray = new Array();
 		var ansstat = new Array();
+		var levelsModel = {}
 		function contains(a,v) {
 		    for(var i = 0; i < a.length; i++) {
 		        if(a[i] === v) return true;
@@ -206,7 +203,11 @@
 			}
 			$("#tresult").html(h + s);
 			console.log(stuNo);
-			levelStat();
+			$.post("/level/",{testName:TestName},function(result){
+				levelsModel = JSON.parse(result);
+				levelStat();
+			});
+
 		}
 		function getAnsTableHead(){
 
@@ -234,15 +235,28 @@
 			$('tresult').hide();
 			$("#btnChart").hide();
 		}
+		function getThes(levelsModel,j){
+			for( i in levelsModel){
+				console.log(levelsModel[i].number == Number(j));
+				if (levelsModel[i].number == Number(j))
+					return levelsModel[i].val;
+			}
+			return 0;
+		}
 		function levelStat(){
-			s = '<table  class="table table-striped table-bordered" ><thead><tr><th>Level</th><th>Percentage</th></tr></thead>'
+			s = '<table  class="table table-striped table-bordered" ><thead><tr><th>Level</th><th>Percentage</th><th>Threshold</th></tr></thead>'
 			for (i in levelObj){
 				max = levelObj[i] * stuNo;
 				ans = levelObjAns[i];
 				percent = ans/max * 100;
 				percent = Math.round(percent * 100) / 100
 				console.log(i);
-				s = s + "<tr><td>level"+i+"</td><td>"+percent+"%</td></tr>";
+				class1 = ""
+				thres = getThes(levelsModel,i);
+				if (thres >  percent){
+					class1="danger"
+				}
+				s = s + "<tr class=\""+class1+"\"><td>level"+i+"</td><td>"+percent+"%</td><td>"+thres+"%</td></tr>";
 			}
 			s = s +"</table>"
 			//alert(s);

@@ -11,12 +11,12 @@
 		<div id="top">
 			<span id="logo">Velammal Classroom Response System</span>
 			<div class="dropdown pull-right" id="settings">
-            <span data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span><b class="caret"></b></span>
-            <ul class="dropdown-menu">
-                <li><a href="change.html">Change password</a></li>
-                <li><a href="addStudents.html">add user</a></li>
-            </ul>
-        </div>
+				<span data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span><b class="caret"></b></span>
+				<ul class="dropdown-menu">
+					<li><a href="change.html">Change password</a></li>
+					<li><a href="addStudents.html">add user</a></li>
+				</ul>
+			</div>
 		</div>
 		<div id="test"></div>
 		<div id="bottomPanel" class="container-fluid">
@@ -34,11 +34,11 @@
 			<div id="listTestOuter1" class="col-md-6 col-md-offset-3">
 				<h3>Tests Available</h3>
 				<div class="list-group" id="listTest1">
-  					<div type="button" class="list-group-item" name="test">Test<span class="badge">12</span><span class="testIcons"><span class="glyphicon glyphicon-play-circle" onclick="testStart(this)"></span><span class="glyphicon glyphicon-stop" onclick="testStop(this)"></span><span></div>
-  					<button type="button" name="test2" class="list-group-item testBtn1">Test2</button>
-  					<button type="button" name="test3" class="list-group-item testBtn1">Test3</button>
-  					<button type="button" name="test4" class="list-group-item testBtn1">Test4</button>
-  					<button type="button" name="chem" class="list-group-item">Chemistry</button>
+					<div type="button" class="list-group-item" name="test">Test<span class="badge">12</span><span class="testIcons"><span class="glyphicon glyphicon-play-circle" onclick="testStart(this)"></span><span class="glyphicon glyphicon-stop" onclick="testStop(this)"></span><span></div>
+					<button type="button" name="test2" class="list-group-item testBtn1">Test2</button>
+					<button type="button" name="test3" class="list-group-item testBtn1">Test3</button>
+					<button type="button" name="test4" class="list-group-item testBtn1">Test4</button>
+					<button type="button" name="chem" class="list-group-item">Chemistry</button>
 				</div>
 				<button class="btn btn-success col-md-6 col-md-offset-3" id="hideOverlayBtn">Go to Dashboard</button>
 			</div>
@@ -52,8 +52,8 @@
 				<div class="col-lg-3 col-md-3" id="panel">
 					<br>
 					<div class="panel panel-primary">
-  						<!-- Default panel contents -->
- 							 <div class="panel-heading " id="testHead"><b>Tests Available</b></div>
+						<!-- Default panel contents -->
+							 <div class="panel-heading " id="testHead"><b>Tests Available</b></div>
 
 					<div class="list-group" id="listTest">
   						<button type="button" class="list-group-item">Test</button>
@@ -183,7 +183,32 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="modalForBlThreshold" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">Set Level Thresholds</h4>
+			</div>
+			<div class="modal-body" id="blevel">
+			</div>
+		</div>
+	</div>
+</div>
+
 	</body>
+	<script src="exp/blevels.js"></script>
+	<script>
+		var node = document.getElementById('blevel');
+		var app = Elm.Main.embed(node);
+		function sendTestName(name){
+			console.log(name+" sending")
+			app.ports.setTestName.send(name);
+		}
+	</script>
 	<style>
 		#panel{
 			background-color:#fff;
@@ -309,11 +334,11 @@
 			margin:5px;
 			display: inline-block;
 			width: 55px;
-  			height: 55px;
-  			border-radius: 50%;
-  			font-size: 30px;
-  			color: #fff;
-  			text-align: center;
+			height: 55px;
+			border-radius: 50%;
+			font-size: 30px;
+			color: #fff;
+			text-align: center;
 			margin-left:5%;
 			margin-right:5%;
 			border:solid 3px #455A64;
@@ -417,11 +442,17 @@
 				return;
 			}
 			$.post('saveToTest/', { testName:TestName, id:$("#questionNo").html(), ques:ques, option1:o1, option2:o2, option3:o3, option4:o4, ans:ans, level: $("#dispLevel").html() }, function(result) {
+				console.log(result);
 				if (result.length < 5){
-					if (result <= No ){
+					if (result == No ){
+						$("#btnSubmit").html("Submit");
+					}
+					if (Number(result) <= No ){
+						console.log("ok");
 						$("#questionNo").html(result);
 						$(".form-control").val("");
-					}else {
+					}else if(Number(result) > No){
+						$("#modalForBlThreshold").modal();
 						notify("Completed");
 					}
 				}else{
@@ -462,6 +493,7 @@
 		}
 
 		function loadQues(id){
+			setPg(id);
 			error = "NOT AVAILABLE";
 			$("#questionNo").html(id);
 			$("#dispLevel").html("");
@@ -492,22 +524,48 @@
 		}
 		setpage(4);
 		function setpage(total){
-			m = 4;
-			if (total > 12 )
+			m = total/2;
+			if (total > 12 ){
 				m = total / 3;
+			}else if (total > 20 ){
+				m = 10;
+			}
 			$('.pagination').bootpag({
        				total: total,
        				maxVisible: m,
-				active: 3
-    				}).on('page', function(event, num){
-					No = num;
-        				loadQues(num); // or some ajax content loading...
-    			});
+					active: 5
+    			}).on('page', function(event, num){
+					//No = num;
+        			loadQues(num); // or some ajax content loading...
+    		});
+
+		}
+		function setPg(num){
+			if(num < No/2){
+				//$(".pagination .prev").trigger('click');
+			}else{
+				//$(".pagination .next").trigger('click');
+			}
+
+			var li = $(".pagination li");
+			li.removeClass("active");
+			for ( i in li){
+				//console.log(li[i]);
+				var temp = "a";
+				try {
+					temp = li[i].getAttribute('data-lp');
+				}catch(e){}
+				if(Number(temp) != NaN){
+					if (temp == num)
+						li[i].classList = ['active'];
+				}
+			}
 
 		}
 		function testClicked(a) {
 			$(".form-control").prop('disabled', false);
 			TestName = a.getAttribute("name");
+			sendTestName(TestName);
 			No = a.getAttribute("number");
 			l = a.getAttribute("level");
 			var nl = Number(l);

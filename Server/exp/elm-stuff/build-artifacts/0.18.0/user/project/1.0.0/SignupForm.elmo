@@ -1,0 +1,253 @@
+var _user$project$SignupForm$initialErrors = {username: '', password: '', usernameTaken: false};
+var _user$project$SignupForm$initialModel = {username: '', password: '', errors: _user$project$SignupForm$initialErrors};
+var _user$project$SignupForm$withUsernameTaken = F2(
+	function (isTaken, model) {
+		var currentErrors = model.errors;
+		var newErrors = _elm_lang$core$Native_Utils.update(
+			currentErrors,
+			{usernameTaken: isTaken});
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{errors: newErrors});
+	});
+var _user$project$SignupForm$getErrors = function (model) {
+	return {
+		username: _elm_lang$core$Native_Utils.eq(model.username, '') ? 'Please enter a username!' : '',
+		password: _elm_lang$core$Native_Utils.eq(model.password, '') ? 'Please enter a password!' : '',
+		usernameTaken: model.errors.usernameTaken
+	};
+};
+var _user$project$SignupForm$update = F2(
+	function (msg, model) {
+		if (_elm_lang$core$Native_Utils.eq(msg.msgType, 'VALIDATE')) {
+			var handleResponse = function (result) {
+				var _p0 = result;
+				if (_p0.ctor === 'Ok') {
+					return {msgType: 'USERNAME_TAKEN', payload: ''};
+				} else {
+					return {msgType: 'USERNAME_AVAILABLE', payload: ''};
+				}
+			};
+			var url = A2(_elm_lang$core$Basics_ops['++'], 'https://api.github.com/users/', model.username);
+			var request = A2(
+				_elm_lang$http$Http$get,
+				url,
+				_elm_lang$core$Json_Decode$succeed(''));
+			var cmd = A2(_elm_lang$http$Http$send, handleResponse, request);
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						errors: _user$project$SignupForm$getErrors(model)
+					}),
+				_1: cmd
+			};
+		} else {
+			if (_elm_lang$core$Native_Utils.eq(msg.msgType, 'SET_USERNAME')) {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{username: msg.payload}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			} else {
+				if (_elm_lang$core$Native_Utils.eq(msg.msgType, 'SET_PASSWORD')) {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{password: msg.payload}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					if (_elm_lang$core$Native_Utils.eq(msg.msgType, 'USERNAME_TAKEN')) {
+						return {
+							ctor: '_Tuple2',
+							_0: A2(_user$project$SignupForm$withUsernameTaken, true, model),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					} else {
+						if (_elm_lang$core$Native_Utils.eq(msg.msgType, 'USERNAME_AVAILABLE')) {
+							return {
+								ctor: '_Tuple2',
+								_0: A2(_user$project$SignupForm$withUsernameTaken, false, model),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+						}
+					}
+				}
+			}
+		}
+	});
+var _user$project$SignupForm$viewUsernameErrors = function (model) {
+	return model.errors.usernameTaken ? 'That username is taken!' : model.errors.username;
+};
+var _user$project$SignupForm$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$form,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$id('signup-form'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onSubmit(
+					{msgType: 'VALIDATE', payload: ''}),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Sensational Signup Form'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$label,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$for('username-field'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('username: '),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id('username-field'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('text'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value(model.username),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(
+											function (str) {
+												return {msgType: 'SET_USERNAME', payload: str};
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('validation-error'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_user$project$SignupForm$viewUsernameErrors(model)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$label,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$for('password'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('password: '),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$id('password-field'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$type_('password'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value(model.password),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(
+														function (str) {
+															return {msgType: 'SET_PASSWORD', payload: str};
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('validation-error'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(model.errors.password),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('signup-button'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$type_('submit'),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Sign Up!'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$SignupForm$main = _elm_lang$html$Html$program(
+	{
+		init: {ctor: '_Tuple2', _0: _user$project$SignupForm$initialModel, _1: _elm_lang$core$Platform_Cmd$none},
+		view: _user$project$SignupForm$view,
+		update: _user$project$SignupForm$update,
+		subscriptions: _elm_lang$core$Basics$always(_elm_lang$core$Platform_Sub$none)
+	})();

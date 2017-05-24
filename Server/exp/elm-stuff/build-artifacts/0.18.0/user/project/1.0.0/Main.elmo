@@ -1,0 +1,312 @@
+var _user$project$Main$encodeModelString = function (model) {
+	return _elm_lang$core$Basics$toString(model);
+};
+var _user$project$Main$encodeInput = function (input) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'number',
+				_1: _elm_lang$core$Json_Encode$int(input.number)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'val',
+					_1: _elm_lang$core$Json_Encode$int(input.val)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Main$encodeModel = function (model) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'levels',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(_elm_lang$core$List$map, _user$project$Main$encodeInput, model.levels))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'testName',
+					_1: _elm_lang$core$Json_Encode$string(model.testName)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Main$urlDecoder = A2(
+	_elm_lang$core$Json_Decode$at,
+	{ctor: '[]'},
+	_elm_lang$core$Json_Decode$string);
+var _user$project$Main$setTestName = _elm_lang$core$Native_Platform.incomingPort('setTestName', _elm_lang$core$Json_Decode$string);
+var _user$project$Main$Model = F4(
+	function (a, b, c, d) {
+		return {levels: a, cnt: b, message: c, testName: d};
+	});
+var _user$project$Main$Input = F2(
+	function (a, b) {
+		return {number: a, val: b};
+	});
+var _user$project$Main$validateInputVal = function (ip) {
+	var val = ip.val;
+	var newval = (_elm_lang$core$Native_Utils.cmp(val, 0) > -1) ? ((_elm_lang$core$Native_Utils.cmp(val, 100) < 1) ? val : 100) : 0;
+	return A2(_user$project$Main$Input, ip.number, newval);
+};
+var _user$project$Main$changeInput = F3(
+	function (val, newip, oldip) {
+		var ip = _elm_lang$core$Native_Utils.eq(newip.number, oldip.number) ? A2(
+			_user$project$Main$Input,
+			newip.number,
+			A2(
+				_elm_lang$core$Result$withDefault,
+				oldip.val,
+				_elm_lang$core$String$toInt(val))) : oldip;
+		return _user$project$Main$validateInputVal(ip);
+	});
+var _user$project$Main$generateInputs = F2(
+	function (i, inputList) {
+		generateInputs:
+		while (true) {
+			var temp = (_elm_lang$core$Native_Utils.cmp(i, 0) > 0) ? {
+				ctor: '::',
+				_0: A2(_user$project$Main$Input, i, 0),
+				_1: {ctor: '[]'}
+			} : {ctor: '[]'};
+			var outList = A2(_elm_lang$core$Basics_ops['++'], inputList, temp);
+			if (_elm_lang$core$Native_Utils.cmp(i, 0) > 0) {
+				var _v0 = i - 1,
+					_v1 = outList;
+				i = _v0;
+				inputList = _v1;
+				continue generateInputs;
+			} else {
+				return outList;
+			}
+		}
+	});
+var _user$project$Main$initInputs = A2(
+	_user$project$Main$generateInputs,
+	4,
+	{ctor: '[]'});
+var _user$project$Main$initModel = {levels: _user$project$Main$initInputs, cnt: 4, message: '', testName: 'elmTest'};
+var _user$project$Main$inputDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'val',
+	_elm_lang$core$Json_Decode$int,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'number',
+		_elm_lang$core$Json_Decode$int,
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$Input)));
+var _user$project$Main$inputListDecode = _elm_lang$core$Json_Decode$list(_user$project$Main$inputDecoder);
+var _user$project$Main$SetTestName = function (a) {
+	return {ctor: 'SetTestName', _0: a};
+};
+var _user$project$Main$subscriptions = function (model) {
+	return _user$project$Main$setTestName(_user$project$Main$SetTestName);
+};
+var _user$project$Main$BtnSubmit = {ctor: 'BtnSubmit'};
+var _user$project$Main$Test = function (a) {
+	return {ctor: 'Test', _0: a};
+};
+var _user$project$Main$putJson = function (model) {
+	var body = _elm_lang$http$Http$jsonBody(
+		_user$project$Main$encodeModel(model));
+	var url = '/level/';
+	var request = A3(_elm_lang$http$Http$post, url, body, _elm_lang$core$Json_Decode$string);
+	return A2(_elm_lang$http$Http$send, _user$project$Main$Test, request);
+};
+var _user$project$Main$GetLevelsJson = function (a) {
+	return {ctor: 'GetLevelsJson', _0: a};
+};
+var _user$project$Main$getJson = function (model) {
+	var url = A2(_elm_lang$core$Basics_ops['++'], '/level/?testName=', model.testName);
+	var request = A2(_elm_lang$http$Http$get, url, _user$project$Main$inputListDecode);
+	return A2(_elm_lang$http$Http$send, _user$project$Main$GetLevelsJson, request);
+};
+var _user$project$Main$init = {
+	ctor: '_Tuple2',
+	_0: _user$project$Main$initModel,
+	_1: _user$project$Main$getJson(_user$project$Main$initModel)
+};
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'NoOp':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'LevelVal':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							levels: A2(
+								_elm_lang$core$List$map,
+								A2(_user$project$Main$changeInput, _p0._1, _p0._0),
+								model.levels)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'GetLevelsJson':
+				if (_p0._0.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{levels: _p0._0._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								message: _elm_lang$core$Basics$toString(_p0._0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+			case 'BtnSubmit':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$putJson(model)
+				};
+			case 'Test':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			default:
+				var newModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{testName: _p0._0});
+				return {
+					ctor: '_Tuple2',
+					_0: newModel,
+					_1: _user$project$Main$getJson(newModel)
+				};
+		}
+	});
+var _user$project$Main$LevelVal = F2(
+	function (a, b) {
+		return {ctor: 'LevelVal', _0: a, _1: b};
+	});
+var _user$project$Main$generateHtmlInput = F2(
+	function (model, ip) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('form-group'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$label,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Level',
+								_elm_lang$core$Basics$toString(ip.number))),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('form-control'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value(
+									_elm_lang$core$Basics$toString(ip.val)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(
+										_user$project$Main$LevelVal(ip)),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$Main$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$map,
+					_user$project$Main$generateHtmlInput(model),
+					model.levels)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(model.message),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('btn btn-success'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$BtnSubmit),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Submit'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_elm_lang$core$Basics$toString(model)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
+var _user$project$Main$main = _elm_lang$html$Html$program(
+	{init: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
+var _user$project$Main$NoOp = {ctor: 'NoOp'};
