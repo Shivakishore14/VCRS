@@ -58,7 +58,7 @@ class Login(QtGui.QMainWindow, Ui_MainWindow):
                 parameters = {"username": ID, "password": Password}
                 data = urllib.urlencode(parameters)
                 try:
-                    req = urllib2.Request("http://localhost:8080/stuLogin/", data)
+                    req = urllib2.Request("http://172.17.90.9:8080/stuLogin/", data)
                     response = urllib2.urlopen(req, timeout=4)
                     name = response.read()
                     print(name)

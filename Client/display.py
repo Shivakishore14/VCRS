@@ -11,16 +11,8 @@ Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
 
 
 class Display(QtGui.QMainWindow, Ui_MainWindow):
-    ID = ""
-    IP = ""
-    id = 1
-    Qtype = ""
-    total = 0
-    j = {}
-    answers = {}
-    test = {}
-    selectedTest = ""
-    answered = 0
+    ID = ""; IP = ""; id = 1; Qtype = ""; total = 0; j = {}; answers = {}; test = {}; selectedTest = ""; answered = 0
+
     def __init__(self, ID, name, IP):
         QtGui.QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
@@ -67,7 +59,8 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         self.scrollArea_2.setVisible(False)
         self.scrollArea_4.setVisible(False)
         self.scrollArea.setVisible(False)
-
+        self.scrollArea_5.setVisible(False)
+        self.scrollArea_3.setVisible(False)
         self.label_4.setVisible(False)
         self.label_5.setVisible(False)
         self.label_6.setVisible(False)
@@ -88,7 +81,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         parameters = {"getTest": self.ID}
         data = urllib.urlencode(parameters)
         try:
-            req = urllib2.Request("http://localhost:8080/getData/", data)
+            req = urllib2.Request("http://172.17.90.9:8080/getData/", data)
             response = urllib2.urlopen(req, timeout=6)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
@@ -109,13 +102,16 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         item = self.test[row]["name"].strip()
         self.selectedTest = self.test[row]["name"]
         self.total = self.test[row]["no"]
+        for i in range(int(self.total)):
+            self.answers[i] = 'Option0'
+
         self.pushButton_2.clicked.connect(self.start)
 
     def start(self):
         parameters = {"setTest": self.selectedTest}
         data = urllib.urlencode(parameters)
         try:
-            req = urllib2.Request("http://localhost:8080/getData/", data)
+            req = urllib2.Request("http://172.17.90.9:8080/getData/", data)
             response = urllib2.urlopen(req, timeout=4)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
@@ -132,7 +128,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
         print(self.selectedTest)
         data = urllib.urlencode(parameters)
         try:
-            req = urllib2.Request("http://localhost:8080/getQuestions/", data)
+            req = urllib2.Request("http://172.17.90.9:8080/getQuestions/", data)
             response = urllib2.urlopen(req, timeout=4)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
@@ -154,6 +150,8 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.scrollArea_2.setVisible(True)
             self.scrollArea_4.setVisible(True)
             self.scrollArea.setVisible(True)
+            self.scrollArea_5.setVisible(True)
+            self.scrollArea_3.setVisible(True)
             self.label_4.setVisible(True)
             self.label_5.setVisible(True)
             self.label_6.setVisible(True)
@@ -226,7 +224,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             data = urllib.urlencode(parameters)
             self.label_2.setText("Your questions for today :   " + str(self.id) + "/" + str(self.total))
             try:
-                req = urllib2.Request("http://localhost:8080/getQuestions/", data)
+                req = urllib2.Request("http://172.17.90.9:8080/getQuestions/", data)
                 response = urllib2.urlopen(req, timeout=4)
             except urllib2.URLError, e:
                 raise Exception("There was an error: %r" % e)
@@ -314,7 +312,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             data = urllib.urlencode(parameters)
             self.label_2.setText("Your questions for today :   " + str(self.id) + "/" + str(self.total))
             try:
-                req = urllib2.Request("http://localhost:8080/getQuestions/", data)
+                req = urllib2.Request("http://172.17.90.9:8080/getQuestions/", data)
                 response = urllib2.urlopen(req, timeout=4)
             except urllib2.URLError, e:
                 raise Exception("There was an error: %r" % e)
@@ -392,25 +390,26 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.answers[self.id - 1] = "option4"
             self.radioButton4.setChecked(False)
 
-        answers = []
+        answer = []
+        print(self.answers)
         for i in range(len(self.answers)):
-            answers.append(self.answers[i])
+            answer.append(self.answers[i])
         print self.selectedTest
 
-        parameters = {"testname": self.selectedTest, "sid": self.ID, "ans": answers}
+        parameters = {"testname": self.selectedTest, "sid": self.ID, "ans": answer}
 
         convert = json.dumps(parameters)
         parameters2 = {"response": convert}
 
         data = urllib.urlencode(parameters2)
         try:
-            req = urllib2.Request("http://localhost:8080/saveResponse/", data)
+            req = urllib2.Request("http://172.17.90.9:8080/saveResponse/", data)
             response = urllib2.urlopen(req, timeout=4)
         except urllib2.URLError, e:
             raise Exception("There was an error: %r" % e)
         jsonvalue = response.read()
-
-        if str(jsonvalue) == "OK":
+        print(jsonvalue)
+        if int(jsonvalue) >= 0:
             self.radioButton1.setVisible(False)
             self.radioButton2.setVisible(False)
             self.radioButton3.setVisible(False)
@@ -426,7 +425,7 @@ class Display(QtGui.QMainWindow, Ui_MainWindow):
             self.toolButton_2.setVisible(False)
             self.pushButton_3.setVisible(False)
             self.pushButton_2.setText("Log out")
-            self.label3.setText("\n \n"+"Thank You. You have completed your test successfully.")
+            self.label3.setText("Your score is "+str(jsonvalue)+"/"+self.total+"\n\n"+"Thank You. You have completed your test successfully.")
             self.label_8.setText("Take next test")
             self.pushButton_2.clicked.disconnect(self.onClicked)
             self.pushButton_2.clicked.connect(self.logout)
@@ -464,7 +463,7 @@ class MyPopup(QtGui.QWidget):
 
         def __init__(self, url):
             QtGui.QWidget.__init__(self)
-            self.data = urllib2.urlopen("http://localhost:8080"+url).read()
+            self.data = urllib2.urlopen("http://172.17.90.9:8080"+url).read()
 
         def disp(self):
             pixmap = QtGui.QPixmap()
