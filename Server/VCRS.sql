@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.17, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.19, for Linux (x86_64)
 --
 -- Host: localhost    Database: VCRS
 -- ------------------------------------------------------
--- Server version	5.7.17-0ubuntu0.16.04.1
+-- Server version	5.7.19-0ubuntu0.16.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -66,7 +66,7 @@ CREATE TABLE `MutiDimentionalArraysresponse` (
 
 LOCK TABLES `MutiDimentionalArraysresponse` WRITE;
 /*!40000 ALTER TABLE `MutiDimentionalArraysresponse` DISABLE KEYS */;
-INSERT INTO `MutiDimentionalArraysresponse` VALUES ('CRS-1234',1,'option1'),('CRS-1234',2,'option1'),('CRS-1234',3,'option2'),('CRS-1234',4,'option1'),('CRS-1234',5,'option4'),('CRS-1234',6,'option4'),('CRS-1234',7,'option4'),('CRS-1234',8,'option3'),('CRS-1234',9,'option2'),('CRS-1234',10,'option1');
+INSERT INTO `MutiDimentionalArraysresponse` VALUES ('CRS-1234',1,'option2'),('CRS-1234',2,'Option0'),('CRS-1234',3,'Option0'),('CRS-1234',4,'Option0'),('CRS-1234',5,'Option0'),('CRS-1234',6,'Option0'),('CRS-1234',7,'Option0'),('CRS-1234',8,'Option0'),('CRS-1234',9,'Option0'),('CRS-1234',10,'option2');
 /*!40000 ALTER TABLE `MutiDimentionalArraysresponse` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -94,6 +94,59 @@ INSERT INTO `admin` VALUES ('sk','kishore');
 UNLOCK TABLES;
 
 --
+-- Table structure for table `elmTest`
+--
+
+DROP TABLE IF EXISTS `elmTest`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `elmTest` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `class` text,
+  `ques` text,
+  `option1` text,
+  `option2` text,
+  `option3` text,
+  `option4` text,
+  `ans` text,
+  `level` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `elmTest`
+--
+
+LOCK TABLES `elmTest` WRITE;
+/*!40000 ALTER TABLE `elmTest` DISABLE KEYS */;
+/*!40000 ALTER TABLE `elmTest` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `elmTestresponse`
+--
+
+DROP TABLE IF EXISTS `elmTestresponse`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `elmTestresponse` (
+  `sid` varchar(10) DEFAULT NULL,
+  `qno` int(11) DEFAULT NULL,
+  `ans` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `elmTestresponse`
+--
+
+LOCK TABLES `elmTestresponse` WRITE;
+/*!40000 ALTER TABLE `elmTestresponse` DISABLE KEYS */;
+/*!40000 ALTER TABLE `elmTestresponse` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `newTest2`
 --
 
@@ -111,7 +164,7 @@ CREATE TABLE `newTest2` (
   `ans` text,
   `level` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,6 +173,7 @@ CREATE TABLE `newTest2` (
 
 LOCK TABLES `newTest2` WRITE;
 /*!40000 ALTER TABLE `newTest2` DISABLE KEYS */;
+INSERT INTO `newTest2` VALUES (1,'','open','asd','jh','gj','hjh','option1','1'),(2,'','j','kj','j','kj','j','option1','2'),(3,'','sdaasd','jkh','hkj','hkj','hkjh','option3','1'),(4,'','hjkj','kjhk','hkj','hkjh','kjhk','option3','1'),(5,'','kjh','kjhk','hkjh','khk','hjkj','option3','1'),(6,'','jk','kjh','kjhkj','hkj','hkj','option3','1'),(7,'','hkjh','kj','hkjh','kh','kjhk','option3','1'),(8,'','jhkj','hkjh','kjh','khk','jhk','option3','1'),(9,'','jkkj','hkjh','kjh','kjhk','hjk','option3','1'),(10,'','jlj','lkjl','kjlk','jlkj','lkjl','option3','1');
 /*!40000 ALTER TABLE `newTest2` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +250,7 @@ CREATE TABLE `sampleTest1` (
 
 LOCK TABLES `sampleTest1` WRITE;
 /*!40000 ALTER TABLE `sampleTest1` DISABLE KEYS */;
-INSERT INTO `sampleTest1` VALUES (1,'class1','what comes after 1','2','1','3','-1','option1','1'),(2,'class1','what comes after 2','0','2','3','-1','option3','1'),(3,'class1','what is 1','odd','even','neither odd nor eveb','none of the above','option1','1'),(4,'','sample q uews','qqqq','wwwww','eeeee','rrrrrr','option2','1');
+INSERT INTO `sampleTest1` VALUES (1,'class1','what comes after 1','2','1','3','-1','option1','1'),(2,'class1','what comes after 2','0','2','3','-1','option3','3'),(3,'class1','what is 1','odd','even','neither odd nor eveb','none of the above','option1','2'),(4,'','sample q uews','qqqq','wwwww','eeeee','rrrrrr','option2','1');
 /*!40000 ALTER TABLE `sampleTest1` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -220,7 +274,7 @@ CREATE TABLE `sampleTest1response` (
 
 LOCK TABLES `sampleTest1response` WRITE;
 /*!40000 ALTER TABLE `sampleTest1response` DISABLE KEYS */;
-INSERT INTO `sampleTest1response` VALUES ('2',1,'option2'),('2',2,'option2'),('2',3,'option3'),('2',4,'option4'),('1',1,'option1'),('1',2,'option2'),('1',3,'option3'),('1',4,'option4'),('3',1,'option1'),('3',2,'option2'),('3',3,'option3'),('3',4,'option4'),('4',1,'option3'),('4',2,'option2'),('4',3,'option3'),('4',4,'option4'),('5',1,'option3'),('5',2,'option1'),('5',3,'option2'),('5',4,'option4'),('6',1,'option3'),('6',2,'option1'),('6',3,'option1'),('6',4,'option4'),('CRS-1234',1,'option2'),('CRS-1234',2,'option4'),('CRS-1234',3,'option2'),('CRS-1234',4,'option4');
+INSERT INTO `sampleTest1response` VALUES ('2',1,'option2'),('2',2,'option2'),('2',3,'option3'),('2',4,'option4'),('1',1,'option1'),('1',2,'option2'),('1',3,'option3'),('1',4,'option4'),('3',1,'option1'),('3',2,'option2'),('3',3,'option3'),('3',4,'option4'),('4',1,'option3'),('4',2,'option2'),('4',3,'option3'),('4',4,'option4'),('5',1,'option3'),('5',2,'option1'),('5',3,'option2'),('5',4,'option4'),('6',1,'option3'),('6',2,'option1'),('6',3,'option1'),('6',4,'option4'),('CRS-1234',1,'option1'),('CRS-1234',2,'option1'),('CRS-1234',3,'option2'),('CRS-1234',4,'option2');
 /*!40000 ALTER TABLE `sampleTest1response` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -242,7 +296,7 @@ CREATE TABLE `sk` (
   `ans` text,
   `level` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -251,7 +305,7 @@ CREATE TABLE `sk` (
 
 LOCK TABLES `sk` WRITE;
 /*!40000 ALTER TABLE `sk` DISABLE KEYS */;
-INSERT INTO `sk` VALUES (1,'','j','jkkj','1jkhkj','hkj','hkjh','option4','2'),(2,'','lj','lkjl','kjlj','lkj','ljl','option4','3');
+INSERT INTO `sk` VALUES (1,'','mk','kl','k;lk',';lk',';lk;','option4','1'),(2,'','lj','lkjl','kjlj','lkj','ljl','option4','3'),(3,'','j','kjkj','j','jk','k','option4','1'),(4,'','sdasd','jk','jkjk','jkj','kjk','option4','2'),(5,'','klj','ljl','jlk','jlk','jlk','option4','1'),(6,'','kmlk','kljl','klk','jlj','lkl','option4','1'),(7,'','','','','','','option4','1'),(8,'','','','','','','option4','1'),(9,'','','','','','','option4','1'),(10,'','','','','','','option4','1');
 /*!40000 ALTER TABLE `sk` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -338,6 +392,7 @@ CREATE TABLE `testDetails` (
   `noOfQues` text,
   `status` text,
   `level` text,
+  `levelJson` text,
   PRIMARY KEY (`testName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -348,7 +403,7 @@ CREATE TABLE `testDetails` (
 
 LOCK TABLES `testDetails` WRITE;
 /*!40000 ALTER TABLE `testDetails` DISABLE KEYS */;
-INSERT INTO `testDetails` VALUES ('MutiDimentionalArrays','10','ONLINE','3'),('newTest2','10','ONLINE','2'),('sampleTest1','4','OFFLINE','4'),('sk','10','ONLINE','3');
+INSERT INTO `testDetails` VALUES ('elmTest','20','','6','[{\"number\":1,\"val\":1},{\"number\":2,\"val\":100},{\"number\":3,\"val\":0},{\"number\":4,\"val\":0},{\"number\":5,\"val\":0},{\"number\":6,\"val\":0}]'),('MutiDimentionalArrays','10','ONLINE','3','[{\"number\":1,\"val\":0},{\"number\":2,\"val\":0},{\"number\":3,\"val\":0}]'),('newTest2','10','ONLINE','2','[{\"number\":1,\"val\":0},{\"number\":2,\"val\"=0}]'),('sampleTest1','4','ONLINE','4','[{\"number\":1,\"val\":10},{\"number\":2,\"val\":10},{\"number\":3,\"val\":10},{\"number\":4,\"val\":100}]'),('sk','10','ONLINE','3','[{\"number\":1,\"val\":0},{\"number\":2,\"val\":0},{\"number\":3,\"val\":0}]');
 /*!40000 ALTER TABLE `testDetails` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -361,4 +416,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-03-22 12:20:08
+-- Dump completed on 2017-10-23 23:10:32
