@@ -85,6 +85,7 @@
             										<li><a href="#" class="level" level="0">level 1</a></li>
           									</ul>
         								</li>
+                                        <li><a href="#" id="lvlThresholdBtn">Set Level Threshold</a></li>
       								</ul>
 								<ul class="nav navbar-nav navbar-right">
 									<li><a href="#" id="navTestName">Select a test</a></li>
@@ -144,7 +145,7 @@
 					</form>
 					<br>
 					<div id="submitDiv">
-						<button id="btnSubmit">submit</button>
+						<button id="btnSubmit">Save Question</button>
 					</div>
 					<div class="row" id="pg">
 						<div class="pagination" class="offset-lg-3 offset-md-4"></div>
@@ -424,6 +425,9 @@
 		$("#btnGoToResults").on('click',function(){
 			window.location.href = 'sample.html';
 		});
+        $("#lvlThresholdBtn").on("click", function(){
+            $("#modalForBlThreshold").modal();
+        });
 		$("#btnSubmit").on("click", function(){
 			if (isImage){
 				uploadFile();
@@ -448,12 +452,11 @@
 						$("#btnSubmit").html("Submit");
 					}
 					if (Number(result) <= No ){
-						console.log("ok");
+						notify("Question saved, Please enter next question");
 						$("#questionNo").html(result);
 						$(".form-control").val("");
 					}else if(Number(result) > No){
-						$("#modalForBlThreshold").modal();
-						notify("Completed");
+						notify("Question saved");
 					}
 				}else{
 					//alert(result);
